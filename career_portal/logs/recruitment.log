@@ -1,0 +1,314 @@
+[2026-06-23 14:18:40] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:19:11] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-23 14:19:11] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-23 14:19:16] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-23 14:19:16] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-23 14:19:16] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-23 14:19:16] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 3457
+[2026-06-23 14:19:22] [INFO] [django.server] "OPTIONS /api/recruitment/screen/ HTTP/1.1" 200 0
+[2026-06-23 14:19:22] [INFO] [recruitment.rag_pipeline] [RAG] Screening — job_id=3 threshold=80%
+[2026-06-23 14:19:22] [INFO] [recruitment.embedder] [Embedder] Connecting to ChromaDB at: C:\Users\SoumyaMedichelmila\career_portal\chroma_db
+[2026-06-23 14:19:22] [INFO] [recruitment.embedder] [Embedder] Loading embedding model: all-MiniLM-L6-v2
+[2026-06-23 14:19:28] [INFO] [recruitment.embedder] [Embedder] Search returned 20 chunks for JD query
+[2026-06-23 14:19:28] [INFO] [recruitment.rag_pipeline] [RAG] ChromaDB returned 20 chunks
+[2026-06-23 14:19:28] [INFO] [recruitment.rag_pipeline] [RAG] 8 unique candidates found
+[2026-06-23 14:19:37] [INFO] [django.server] "POST /api/recruitment/screen/ HTTP/1.1" 200 7176
+[2026-06-23 14:21:02] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\employee_management\settings.py changed, reloading.
+[2026-06-23 14:21:05] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:21:35] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:23:43] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 14:23:46] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:24:22] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 14:24:24] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:24:35] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 14:24:36] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:25:06] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 14:25:08] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:25:48] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 14:25:51] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:26:36] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 14:26:38] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:27:10] [INFO] [django.server] "OPTIONS /api/recruitment/screen/ HTTP/1.1" 200 0
+[2026-06-23 14:27:10] [INFO] [recruitment.rag_pipeline] [RAG] Screening — job_id=3 threshold=80%
+[2026-06-23 14:27:10] [INFO] [recruitment.embedder] [Embedder] Connecting to ChromaDB at: C:\Users\SoumyaMedichelmila\career_portal\chroma_db
+[2026-06-23 14:27:10] [INFO] [recruitment.embedder] [Embedder] Loading embedding model: all-MiniLM-L6-v2
+[2026-06-23 14:27:15] [INFO] [recruitment.embedder] [Embedder] Search returned 20 chunks for JD query
+[2026-06-23 14:27:15] [INFO] [recruitment.rag_pipeline] [RAG] ChromaDB returned 20 chunks
+[2026-06-23 14:27:15] [INFO] [recruitment.rag_pipeline] [RAG] 8 unique candidates found
+[2026-06-23 14:27:24] [INFO] [recruitment.rag_pipeline] [RAG] [OK] Scoring done — total=8
+[2026-06-23 14:27:25] [INFO] [django.server] "POST /api/recruitment/screen/ HTTP/1.1" 200 7015
+[2026-06-23 14:28:38] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\manage.py changed, reloading.
+[2026-06-23 14:28:41] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:29:22] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 14:29:25] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:30:45] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\embedder.py changed, reloading.
+[2026-06-23 14:30:48] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 14:31:16] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-23 14:31:16] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-23 14:31:16] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-23 14:31:16] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 3457
+[2026-06-23 14:31:18] [INFO] [django.server] "OPTIONS /api/recruitment/screen/ HTTP/1.1" 200 0
+[2026-06-23 14:31:18] [INFO] [recruitment.rag_pipeline] [RAG] Screening — job_id=3 threshold=80%
+[2026-06-23 14:31:18] [INFO] [recruitment.embedder] [Embedder] Connecting to ChromaDB at: C:\Users\SoumyaMedichelmila\career_portal\chroma_db
+[2026-06-23 14:31:18] [INFO] [recruitment.embedder] [Embedder] ChromaDB connected [OK]
+[2026-06-23 14:31:18] [INFO] [recruitment.embedder] [Embedder] Loading embedding model: all-MiniLM-L6-v2
+[2026-06-23 14:31:24] [INFO] [recruitment.embedder] [Embedder] Model loaded  [OK]
+[2026-06-23 14:31:24] [INFO] [recruitment.embedder] [Embedder] Search returned 20 chunks for JD query
+[2026-06-23 14:31:24] [INFO] [recruitment.rag_pipeline] [RAG] ChromaDB returned 20 chunks
+[2026-06-23 14:31:24] [INFO] [recruitment.rag_pipeline] [RAG] 8 unique candidates found
+[2026-06-23 14:31:25] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=23 (Priya Nair Backend) -> 95%
+[2026-06-23 14:31:27] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=24 (Deepika Reddy Django API Developer) -> 98%
+[2026-06-23 14:31:28] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=16 (Rohan Sharma Software) -> 20%
+[2026-06-23 14:31:29] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=22 (Varshini Reddy) -> 60%
+[2026-06-23 14:31:30] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=26 (Karthik Raj Frontend) -> 20%
+[2026-06-23 14:31:31] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=27 (Aisha Siddiqui Web Developer) -> 20%
+[2026-06-23 14:31:32] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=18 (Arjun Mehta Senior) -> 20%
+[2026-06-23 14:31:33] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=19 (Meena Bala) -> 10%
+[2026-06-23 14:31:33] [INFO] [recruitment.rag_pipeline] [RAG] [OK] Scoring done — total=8
+[2026-06-23 14:31:33] [INFO] [django.server] "POST /api/recruitment/screen/ HTTP/1.1" 200 7307
+[2026-06-23 14:50:10] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 14:50:13] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 15:04:08] [INFO] [django.utils.autoreload] C:\Users\SoumyaMedichelmila\career_portal\recruitment\rag_pipeline.py changed, reloading.
+[2026-06-23 15:04:12] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-23 15:18:29] [INFO] [django.server] "OPTIONS /api/accounts/employees/10/ HTTP/1.1" 200 0
+[2026-06-23 15:18:29] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-23 15:18:29] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-23 15:18:29] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-23 15:18:29] [WARNING] [django.request] Unauthorized: /api/accounts/employees/10/
+[2026-06-23 15:18:29] [WARNING] [django.request] Unauthorized: /api/masters/departments/
+[2026-06-23 15:18:29] [WARNING] [django.request] Unauthorized: /api/masters/locations/
+[2026-06-23 15:18:29] [WARNING] [django.request] Unauthorized: /api/masters/skills/
+[2026-06-23 15:18:29] [WARNING] [django.server] "GET /api/accounts/employees/10/ HTTP/1.1" 401 172
+[2026-06-23 15:18:29] [WARNING] [django.server] "GET /api/masters/departments/ HTTP/1.1" 401 172
+[2026-06-23 15:18:29] [WARNING] [django.server] "GET /api/masters/skills/ HTTP/1.1" 401 172
+[2026-06-23 15:18:29] [WARNING] [django.server] "GET /api/masters/locations/ HTTP/1.1" 401 172
+[2026-06-23 15:18:42] [INFO] [django.server] "OPTIONS /api/accounts/login/ HTTP/1.1" 200 0
+[2026-06-23 15:18:43] [INFO] [django.server] "POST /api/accounts/login/ HTTP/1.1" 200 701
+[2026-06-23 15:18:43] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-23 15:18:43] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-23 15:18:43] [INFO] [django.server] "OPTIONS /api/accounts/employees/10/ HTTP/1.1" 200 0
+[2026-06-23 15:18:43] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-23 15:18:43] [INFO] [django.server] "GET /api/accounts/employees/10/ HTTP/1.1" 200 222
+[2026-06-23 15:18:43] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-23 15:18:43] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-23 15:18:43] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-23 15:18:46] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-23 15:18:46] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-23 15:18:46] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-23 15:18:46] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 3457
+[2026-06-23 15:18:48] [INFO] [django.server] "OPTIONS /api/accounts/employees/10/ HTTP/1.1" 200 0
+[2026-06-23 15:18:48] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-23 15:18:48] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-23 15:18:48] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-23 15:18:48] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-23 15:18:48] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-23 15:18:48] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-23 15:18:48] [INFO] [django.server] "GET /api/accounts/employees/10/ HTTP/1.1" 200 222
+[2026-06-23 15:18:48] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-23 15:18:48] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-23 15:22:48] [INFO] [django.server] "OPTIONS /api/jobs/vacancy-requests/ HTTP/1.1" 200 0
+[2026-06-23 15:22:48] [INFO] [django.server] "GET /api/jobs/vacancy-requests/ HTTP/1.1" 200 2
+[2026-06-23 15:22:51] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-23 15:22:51] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-23 15:22:51] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-23 15:22:51] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-23 15:22:51] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-23 15:22:51] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-24 09:57:19] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-24 09:59:23] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-24 10:01:37] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-24 10:02:39] [INFO] [django.server] "OPTIONS /api/accounts/login/ HTTP/1.1" 200 0
+[2026-06-24 10:02:40] [INFO] [django.server] "POST /api/accounts/login/ HTTP/1.1" 200 694
+[2026-06-24 10:02:41] [INFO] [django.server] "OPTIONS /api/accounts/employees/ HTTP/1.1" 200 0
+[2026-06-24 10:02:41] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-24 10:02:41] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-24 10:02:41] [INFO] [django.server] "OPTIONS /api/recruitment/results/ HTTP/1.1" 200 0
+[2026-06-24 10:02:41] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-24 10:02:41] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-24 10:02:41] [INFO] [django.server] "OPTIONS /api/jobs/vacancy-requests/ HTTP/1.1" 200 0
+[2026-06-24 10:02:41] [INFO] [django.server] "OPTIONS /api/accounts/employees/7/ HTTP/1.1" 200 0
+[2026-06-24 10:02:41] [INFO] [django.server] "GET /api/recruitment/results/ HTTP/1.1" 200 165
+[2026-06-24 10:02:41] [INFO] [django.server] "GET /api/accounts/employees/ HTTP/1.1" 200 2300
+[2026-06-24 10:02:41] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-24 10:02:41] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-24 10:02:41] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-24 10:02:42] [INFO] [django.server] "GET /api/accounts/employees/7/ HTTP/1.1" 200 234
+[2026-06-24 10:02:42] [INFO] [django.server] "GET /api/jobs/vacancy-requests/ HTTP/1.1" 200 1631
+[2026-06-24 10:02:42] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 5514
+[2026-06-24 10:02:44] [INFO] [django.server] "OPTIONS /api/accounts/employees/ HTTP/1.1" 200 0
+[2026-06-24 10:02:44] [INFO] [django.server] "OPTIONS /api/recruitment/shortlist/jobs/ HTTP/1.1" 200 0
+[2026-06-24 10:02:44] [INFO] [django.server] "GET /api/recruitment/shortlist/jobs/ HTTP/1.1" 200 186
+[2026-06-24 10:02:44] [INFO] [django.server] "GET /api/accounts/employees/ HTTP/1.1" 200 2300
+[2026-06-24 10:02:46] [INFO] [django.server] "OPTIONS /api/accounts/employees/ HTTP/1.1" 200 0
+[2026-06-24 10:02:46] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-24 10:02:46] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-24 10:02:46] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-24 10:02:46] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-24 10:02:46] [INFO] [django.server] "OPTIONS /api/jobs/vacancy-requests/ HTTP/1.1" 200 0
+[2026-06-24 10:02:46] [INFO] [django.server] "OPTIONS /api/recruitment/results/ HTTP/1.1" 200 0
+[2026-06-24 10:02:46] [INFO] [django.server] "OPTIONS /api/accounts/employees/7/ HTTP/1.1" 200 0
+[2026-06-24 10:02:46] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-24 10:02:46] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-24 10:02:46] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-24 10:02:46] [INFO] [django.server] "GET /api/accounts/employees/ HTTP/1.1" 200 2300
+[2026-06-24 10:02:46] [INFO] [django.server] "GET /api/recruitment/results/ HTTP/1.1" 200 165
+[2026-06-24 10:02:46] [INFO] [django.server] "GET /api/accounts/employees/7/ HTTP/1.1" 200 234
+[2026-06-24 10:02:46] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 5514
+[2026-06-24 10:02:46] [INFO] [django.server] "GET /api/jobs/vacancy-requests/ HTTP/1.1" 200 1631
+[2026-06-24 10:02:48] [INFO] [django.server] "OPTIONS /api/recruitment/results/ HTTP/1.1" 200 0
+[2026-06-24 10:02:48] [INFO] [django.server] "GET /api/recruitment/results/ HTTP/1.1" 200 165
+[2026-06-24 10:02:51] [INFO] [django.server] "OPTIONS /api/recruitment/results/3/ HTTP/1.1" 200 0
+[2026-06-24 10:02:51] [INFO] [django.server] "GET /api/recruitment/results/3/ HTTP/1.1" 200 7472
+[2026-06-24 10:02:53] [INFO] [django.server] "OPTIONS /api/recruitment/results/2/ HTTP/1.1" 200 0
+[2026-06-24 10:02:53] [INFO] [django.server] "GET /api/recruitment/results/2/ HTTP/1.1" 200 8474
+[2026-06-24 10:03:05] [INFO] [django.server] "OPTIONS /api/recruitment/results/3/ HTTP/1.1" 200 0
+[2026-06-24 10:03:05] [INFO] [django.server] "GET /api/recruitment/results/3/ HTTP/1.1" 200 7472
+[2026-06-24 10:03:07] [INFO] [django.server] "OPTIONS /api/accounts/employees/ HTTP/1.1" 200 0
+[2026-06-24 10:03:07] [INFO] [django.server] "OPTIONS /api/recruitment/results/ HTTP/1.1" 200 0
+[2026-06-24 10:03:07] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-24 10:03:07] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-24 10:03:07] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-24 10:03:07] [INFO] [django.server] "OPTIONS /api/jobs/vacancy-requests/ HTTP/1.1" 200 0
+[2026-06-24 10:03:07] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-24 10:03:07] [INFO] [django.server] "OPTIONS /api/accounts/employees/7/ HTTP/1.1" 200 0
+[2026-06-24 10:03:07] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-24 10:03:07] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-24 10:03:07] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-24 10:03:07] [INFO] [django.server] "GET /api/recruitment/results/ HTTP/1.1" 200 165
+[2026-06-24 10:03:07] [INFO] [django.server] "GET /api/accounts/employees/7/ HTTP/1.1" 200 234
+[2026-06-24 10:03:07] [INFO] [django.server] "GET /api/accounts/employees/ HTTP/1.1" 200 2300
+[2026-06-24 10:03:07] [INFO] [django.server] "GET /api/jobs/vacancy-requests/ HTTP/1.1" 200 1631
+[2026-06-24 10:03:07] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 5514
+[2026-06-24 10:03:08] [INFO] [django.server] "OPTIONS /api/accounts/employees/ HTTP/1.1" 200 0
+[2026-06-24 10:03:08] [INFO] [django.server] "OPTIONS /api/recruitment/shortlist/jobs/ HTTP/1.1" 200 0
+[2026-06-24 10:03:08] [INFO] [django.server] "GET /api/recruitment/shortlist/jobs/ HTTP/1.1" 200 186
+[2026-06-24 10:03:08] [INFO] [django.server] "GET /api/accounts/employees/ HTTP/1.1" 200 2300
+[2026-06-24 10:03:10] [INFO] [django.server] "OPTIONS /api/recruitment/shortlist/job/2/ HTTP/1.1" 200 0
+[2026-06-24 10:03:10] [INFO] [django.server] "GET /api/recruitment/shortlist/job/2/ HTTP/1.1" 200 5976
+[2026-06-24 10:03:12] [INFO] [django.server] "OPTIONS /api/recruitment/shortlist/job/3/ HTTP/1.1" 200 0
+[2026-06-24 10:03:12] [INFO] [django.server] "GET /api/recruitment/shortlist/job/3/ HTTP/1.1" 200 3101
+[2026-06-24 10:03:15] [INFO] [django.server] "OPTIONS /api/recruitment/shortlist/job/2/ HTTP/1.1" 200 0
+[2026-06-24 10:03:15] [INFO] [django.server] "GET /api/recruitment/shortlist/job/2/ HTTP/1.1" 200 5976
+[2026-06-26 11:18:05] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-26 15:30:10] [INFO] [django.server] "OPTIONS /api/accounts/login/ HTTP/1.1" 200 0
+[2026-06-26 15:30:12] [INFO] [django.server] "POST /api/accounts/login/ HTTP/1.1" 200 701
+[2026-06-26 15:30:13] [INFO] [django.server] "OPTIONS /api/accounts/employees/10/ HTTP/1.1" 200 0
+[2026-06-26 15:30:13] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-26 15:30:13] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-26 15:30:13] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-26 15:30:13] [INFO] [django.server] "GET /api/accounts/employees/10/ HTTP/1.1" 200 222
+[2026-06-26 15:30:13] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-26 15:30:13] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-26 15:30:13] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-26 15:30:15] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-26 15:30:15] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-26 15:30:15] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-26 15:30:15] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 3457
+[2026-06-26 15:30:17] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-26 15:30:17] [INFO] [django.server] "OPTIONS /api/accounts/employees/10/ HTTP/1.1" 200 0
+[2026-06-26 15:30:17] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-26 15:30:17] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-26 15:30:17] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-26 15:30:17] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-26 15:30:17] [INFO] [django.server] "GET /api/accounts/employees/10/ HTTP/1.1" 200 222
+[2026-06-26 15:30:17] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-26 15:30:18] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-26 15:30:18] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-26 15:35:20] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-26 15:35:20] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-26 15:35:35] [INFO] [django.server] "OPTIONS /api/recruitment/resume-preview/?filename=06_Aisha_Siddiqui_ATS74_20260623_140939.pdf HTTP/1.1" 200 0
+[2026-06-26 15:35:35] [INFO] [recruitment.views] [ResumePreviewView] Not on disk. SP lookup: requested=06_Aisha_Siddiqui_ATS74_20260623_140939.pdf resolved=06_Aisha_Siddiqui_ATS74_20260623_140939.pdf
+[2026-06-26 15:35:35] [INFO] [recruitment.sharepoint_client] [SharePoint] Downloading: 06_Aisha_Siddiqui_ATS74_20260623_140939.pdf
+[2026-06-26 15:35:39] [DEBUG] [recruitment.sharepoint_client] [SharePoint] '06_Aisha_Siddiqui_ATS74_20260623_140939.pdf' â€” Content-Type: application/pdf, raw size: 3034 bytes, first bytes: b'%PDF-1.4\n%\x93\x8c\x8b\x9e ReportLab Gener'
+[2026-06-26 15:35:39] [DEBUG] [recruitment.sharepoint_client] [SharePoint] '06_Aisha_Siddiqui_ATS74_20260623_140939.pdf' is raw PDF âœ…
+[2026-06-26 15:35:39] [INFO] [recruitment.sharepoint_client] [SharePoint] Downloaded '06_Aisha_Siddiqui_ATS74_20260623_140939.pdf' â€” 3034 bytes âœ…
+[2026-06-26 15:35:39] [INFO] [recruitment.views] [ResumePreviewView] Serving from SharePoint: 06_Aisha_Siddiqui_ATS74_20260623_140939.pdf
+[2026-06-26 15:35:39] [INFO] [django.server] "GET /api/recruitment/resume-preview/?filename=06_Aisha_Siddiqui_ATS74_20260623_140939.pdf HTTP/1.1" 200 3034
+[2026-06-26 15:35:53] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-26 15:35:53] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-26 15:35:53] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-26 15:35:53] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 3457
+[2026-06-26 15:35:58] [INFO] [django.server] "OPTIONS /api/recruitment/screen/ HTTP/1.1" 200 0
+[2026-06-26 15:35:58] [INFO] [recruitment.rag_pipeline] [RAG] Screening â€” job_id=3 threshold=80%
+[2026-06-26 15:35:58] [INFO] [recruitment.embedder] [Embedder] Connecting to ChromaDB at: C:\Users\SoumyaMedichelmila\career_portal\chroma_db
+[2026-06-26 15:35:58] [INFO] [recruitment.embedder] [Embedder] ChromaDB connected [OK]
+[2026-06-26 15:35:58] [INFO] [recruitment.embedder] [Embedder] Loading embedding model: all-MiniLM-L6-v2
+[2026-06-26 15:36:04] [INFO] [recruitment.embedder] [Embedder] Model loaded  [OK]
+[2026-06-26 15:36:05] [INFO] [recruitment.embedder] [Embedder] Search returned 20 chunks for JD query
+[2026-06-26 15:36:05] [INFO] [recruitment.rag_pipeline] [RAG] ChromaDB returned 20 chunks
+[2026-06-26 15:36:05] [INFO] [recruitment.rag_pipeline] [RAG] 8 unique candidates found
+[2026-06-26 15:36:07] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=23 (Priya Nair Backend) -> 95%
+[2026-06-26 15:36:07] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=24 (Deepika Reddy Django API Developer) -> 98%
+[2026-06-26 15:36:09] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=16 (Rohan Sharma Software) -> 20%
+[2026-06-26 15:36:10] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=22 (Varshini Reddy) -> 60%
+[2026-06-26 15:36:10] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=26 (Karthik Raj Frontend) -> 20%
+[2026-06-26 15:36:12] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=27 (Aisha Siddiqui Web Developer) -> 20%
+[2026-06-26 15:36:12] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=18 (Arjun Mehta Senior) -> 20%
+[2026-06-26 15:36:13] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=19 (Meena Bala) -> 10%
+[2026-06-26 15:36:13] [INFO] [recruitment.rag_pipeline] [RAG] [OK] Scoring done â€” total=8
+[2026-06-26 15:36:13] [INFO] [django.server] "POST /api/recruitment/screen/ HTTP/1.1" 200 7326
+[2026-06-26 15:37:56] [INFO] [django.server] "OPTIONS /api/accounts/employees/10/ HTTP/1.1" 200 0
+[2026-06-26 15:37:56] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-26 15:37:56] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-26 15:37:56] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-26 15:37:56] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-26 15:37:56] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-26 15:37:56] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-26 15:37:56] [INFO] [django.server] "GET /api/accounts/employees/10/ HTTP/1.1" 200 222
+[2026-06-26 15:37:56] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-26 15:37:56] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-26 15:38:10] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-26 15:38:10] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-26 15:38:10] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-26 15:38:10] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 3457
+[2026-06-26 15:59:10] [INFO] [django.utils.autoreload] Watching for file changes with StatReloader
+[2026-06-26 15:59:52] [WARNING] [django.request] Not Found: /
+[2026-06-26 15:59:52] [WARNING] [django.server] "GET / HTTP/1.1" 404 3138
+[2026-06-26 16:00:07] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-26 16:00:07] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-26 16:00:07] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-26 16:00:07] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 3457
+[2026-06-29 10:01:11] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-29 10:01:11] [WARNING] [django.request] Unauthorized: /api/recruitment/candidates/
+[2026-06-29 10:01:11] [WARNING] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 401 172
+[2026-06-29 10:01:11] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-29 10:01:11] [WARNING] [django.request] Unauthorized: /api/jobs/openings/
+[2026-06-29 10:01:11] [WARNING] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 401 172
+[2026-06-29 10:01:11] [INFO] [django.server] "OPTIONS /api/jobs/ HTTP/1.1" 200 0
+[2026-06-29 10:01:11] [WARNING] [django.request] Not Found: /api/jobs/
+[2026-06-29 10:01:11] [WARNING] [django.server] "GET /api/jobs/ HTTP/1.1" 404 4815
+[2026-06-29 10:01:38] [INFO] [django.server] "OPTIONS /api/accounts/login/ HTTP/1.1" 200 0
+[2026-06-29 10:01:39] [INFO] [django.server] "POST /api/accounts/login/ HTTP/1.1" 200 701
+[2026-06-29 10:01:40] [INFO] [django.server] "OPTIONS /api/accounts/employees/10/ HTTP/1.1" 200 0
+[2026-06-29 10:01:40] [INFO] [django.server] "OPTIONS /api/masters/departments/ HTTP/1.1" 200 0
+[2026-06-29 10:01:40] [INFO] [django.server] "OPTIONS /api/masters/locations/ HTTP/1.1" 200 0
+[2026-06-29 10:01:40] [INFO] [django.server] "OPTIONS /api/masters/skills/ HTTP/1.1" 200 0
+[2026-06-29 10:01:40] [INFO] [django.server] "GET /api/masters/skills/ HTTP/1.1" 200 741
+[2026-06-29 10:01:40] [INFO] [django.server] "GET /api/masters/locations/ HTTP/1.1" 200 153
+[2026-06-29 10:01:40] [INFO] [django.server] "GET /api/masters/departments/ HTTP/1.1" 200 1043
+[2026-06-29 10:01:40] [INFO] [django.server] "GET /api/accounts/employees/10/ HTTP/1.1" 200 222
+[2026-06-29 10:01:42] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-29 10:01:42] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-29 10:01:48] [INFO] [django.server] "OPTIONS /api/recruitment/candidates/ HTTP/1.1" 200 0
+[2026-06-29 10:01:48] [INFO] [django.server] "GET /api/recruitment/candidates/ HTTP/1.1" 200 4011
+[2026-06-29 10:01:48] [INFO] [django.server] "OPTIONS /api/jobs/openings/ HTTP/1.1" 200 0
+[2026-06-29 10:01:48] [INFO] [django.server] "GET /api/jobs/openings/ HTTP/1.1" 200 3457
+[2026-06-29 10:33:38] [INFO] [django.server] "OPTIONS /api/recruitment/screen/ HTTP/1.1" 200 0
+[2026-06-29 10:33:38] [INFO] [recruitment.rag_pipeline] [RAG] Screening â€” job_id=3 threshold=80%
+[2026-06-29 10:33:38] [INFO] [recruitment.embedder] [Embedder] Connecting to ChromaDB at: C:\Users\SoumyaMedichelmila\career_portal\chroma_db
+[2026-06-29 10:33:38] [INFO] [recruitment.embedder] [Embedder] ChromaDB connected [OK]
+[2026-06-29 10:33:38] [INFO] [recruitment.embedder] [Embedder] Loading embedding model: all-MiniLM-L6-v2
+[2026-06-29 10:33:46] [INFO] [recruitment.embedder] [Embedder] Model loaded  [OK]
+[2026-06-29 10:33:46] [INFO] [recruitment.embedder] [Embedder] Search returned 20 chunks for JD query
+[2026-06-29 10:33:46] [INFO] [recruitment.rag_pipeline] [RAG] ChromaDB returned 20 chunks
+[2026-06-29 10:33:46] [INFO] [recruitment.rag_pipeline] [RAG] 8 unique candidates found
+[2026-06-29 10:33:54] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=23 (Priya Nair Backend) -> 95%
+[2026-06-29 10:33:55] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=24 (Deepika Reddy Django API Developer) -> 98%
+[2026-06-29 10:33:56] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=16 (Rohan Sharma Software) -> 20%
+[2026-06-29 10:33:56] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=22 (Varshini Reddy) -> 60%
+[2026-06-29 10:33:57] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=26 (Karthik Raj Frontend) -> 20%
+[2026-06-29 10:33:58] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=27 (Aisha Siddiqui Web Developer) -> 20%
+[2026-06-29 10:33:59] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=18 (Arjun Mehta Senior) -> 20%
+[2026-06-29 10:34:00] [INFO] [recruitment.rag_pipeline] [RAG] candidate_id=19 (Meena Bala) -> 10%
+[2026-06-29 10:34:00] [INFO] [recruitment.rag_pipeline] [RAG] [OK] Scoring done â€” total=8
+[2026-06-29 10:34:00] [INFO] [django.server] "POST /api/recruitment/screen/ HTTP/1.1" 200 7127
