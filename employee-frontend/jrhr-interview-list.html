@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — All Interviews</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .filter-bar {
+            display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;
+        }
+        .filter-bar select, .filter-bar input {
+            padding: 9px 14px; border: 1px solid #E5E7EB; border-radius: 8px;
+            font-size: 13px; color: #374151; background: white;
+        }
+        .interview-row {
+            display: grid;
+            grid-template-columns: 180px 160px 120px 140px 140px 100px 90px;
+            align-items: center; gap: 8px;
+            padding: 14px 16px; border-bottom: 1px solid #F3F4F6;
+            font-size: 13px; transition: background .15s;
+        }
+        .interview-row:hover { background: #F9FAFB; }
+        .interview-header {
+            display: grid;
+            grid-template-columns: 180px 160px 120px 140px 140px 100px 90px;
+            gap: 8px;
+            padding: 10px 16px; background: #F9FAFB;
+            font-size: 11px; font-weight: 700; color: #6B7280;
+            text-transform: uppercase; letter-spacing: .5px;
+            border-bottom: 1px solid #E5E7EB; border-radius: 8px 8px 0 0;
+        }
+        .status-badge {
+            padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+            display: inline-block;
+        }
+        .status-SCHEDULED  { background: #EFF6FF; color: #0EA5E9; }
+        .status-COMPLETED  { background: #ECFDF5; color: #059669; }
+        .status-CANCELLED  { background: #FEF2F2; color: #DC2626; }
+        .email-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .email-yes { background: #10B981; }
+        .email-no  { background: #F87171; }
+        .mode-badge {
+            font-size: 11px; font-weight: 600; padding: 3px 10px;
+            border-radius: 20px; background: #F3F4F6; color: #374151;
+        }
+        .empty-state { text-align: center; padding: 48px; color: #9CA3AF; font-size: 14px; }
+        .table-wrap { border: 1px solid #E5E7EB; border-radius: 12px; overflow: hidden; }
+        .cand-name { font-weight: 600; color: #111827; }
+        .cand-sub  { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo"><h1>⚡ SynergyCom</h1><p>Junior HR Portal</p></div>
+        <nav class="sidebar-nav">
+            <a href="jrhr-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <!-- <a href="jrhr-interview-schedule.html"><span class="icon">📅</span> Schedule Interviews</a> -->
+            <a href="jrhr-interview-list.html" class="active"><span class="icon">📋</span> All Interviews</a>
+            <a href="job-openings.html"><span class="icon">📢</span> Job Openings</a>
+            <a href="change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">J</div>
+                <div class="user-info">
+                    <p id="user-name">Junior HR</p>
+                    <span id="user-role">JR HR</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+            <p class="page-title" style="margin:0">📋 All Scheduled Interviews</p>
+            <a href="jrhr-dashboard.html" class="btn btn-secondary btn-sm">← Dashboard</a>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+            <select id="filter-job" onchange="applyFilters()">
+                <option value="">All Jobs</option>
+            </select>
+            <select id="filter-status" onchange="applyFilters()">
+                <option value="">All Statuses</option>
+                <option value="SCHEDULED">Scheduled</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+            </select>
+            <input type="text" id="filter-search" placeholder="Search candidate name…" oninput="applyFilters()" />
+            <span id="count-label" style="font-size:13px;color:#6B7280;margin-left:auto"></span>
+        </div>
+
+        <div id="table-container">
+            <div class="loading">Loading interviews…</div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    const API   = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role  = localStorage.getItem('role_code');
+
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'JR_HR') window.location.href = 'employee-dashboard.html';
+
+    const name = localStorage.getItem('employee_name') || 'Junior HR';
+    document.getElementById('user-name').textContent      = name;
+    document.getElementById('user-role').textContent      = localStorage.getItem('role_name') || 'Junior HR';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    let allInterviews = [];
+    let jobMap        = {};
+
+    async function loadAll() {
+        try {
+            // 1. Get all jobs that have interviews
+            const intJobsRes = await fetch(`${API}/recruitment/interview/jobs/`, { headers: authHeaders() });
+            if (intJobsRes.status === 401) { logout(); return; }
+            const intJobs = await intJobsRes.json();
+
+            intJobs.forEach(j => jobMap[j.job_id] = j.job_title);
+
+            // Populate job filter
+            const jobSel = document.getElementById('filter-job');
+            intJobs.forEach(j => {
+                const opt = document.createElement('option');
+                opt.value = j.job_id; opt.textContent = j.job_title;
+                jobSel.appendChild(opt);
+            });
+
+            // 2. Fetch interviews for each job in parallel
+            const promises = intJobs.map(j =>
+                fetch(`${API}/recruitment/interview/job/${j.job_id}/`, { headers: authHeaders() })
+                    .then(r => r.json())
+                    .then(d => d.interviews || [])
+            );
+            const results = await Promise.all(promises);
+            allInterviews = results.flat();
+
+            applyFilters();
+        } catch(e) {
+            console.error(e);
+            document.getElementById('table-container').innerHTML =
+                '<div class="empty-state">Failed to load interviews. Please refresh.</div>';
+        }
+    }
+
+    function applyFilters() {
+        const jobFilter    = document.getElementById('filter-job').value;
+        const statusFilter = document.getElementById('filter-status').value;
+        const search       = document.getElementById('filter-search').value.toLowerCase();
+
+        let filtered = allInterviews.filter(iv => {
+            const matchJob    = !jobFilter    || String(iv.shortlist) === String(jobFilter) || jobMatch(iv, jobFilter);
+            const matchStatus = !statusFilter || iv.status === statusFilter;
+            const matchSearch = !search       || iv.candidate_name.toLowerCase().includes(search);
+            return matchJob && matchStatus && matchSearch;
+        });
+
+        // We don't have job_id directly on interview — filter by job_title match instead
+        if (jobFilter) {
+            filtered = allInterviews.filter(iv => {
+                const matchJob    = iv.job_title === jobMap[jobFilter];
+                const matchStatus = !statusFilter || iv.status === statusFilter;
+                const matchSearch = !search       || iv.candidate_name.toLowerCase().includes(search);
+                return matchJob && matchStatus && matchSearch;
+            });
+        }
+
+        document.getElementById('count-label').textContent = `${filtered.length} interview(s)`;
+        renderTable(filtered);
+    }
+
+    function jobMatch(iv, jobId) {
+        return iv.job_title === jobMap[jobId];
+    }
+
+    function renderTable(data) {
+        const container = document.getElementById('table-container');
+
+        if (!data.length) {
+            container.innerHTML = '<div class="empty-state">No interviews found matching your filters.</div>';
+            return;
+        }
+
+        const rows = data.map(iv => {
+            const dateStr = new Date(iv.interview_date).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+            const timeStr = iv.interview_time.slice(0, 5); // HH:MM
+
+            return `
+            <div class="interview-row">
+                <div>
+                    <div class="cand-name">${iv.candidate_name}</div>
+                    <div class="cand-sub">${iv.candidate_email || '—'}</div>
+                </div>
+                <div>
+                    <div style="font-weight:600;color:#111827">${iv.job_title}</div>
+                </div>
+                <div>${dateStr}<br><span style="color:#6B7280">${timeStr}</span></div>
+                <div>
+                    <div style="font-weight:500">${iv.interviewer_name}</div>
+                    <div class="cand-sub">${iv.interviewer_email || ''}</div>
+                </div>
+                <div><span class="mode-badge">${iv.mode === 'ONLINE' ? '🌐 Online' : '🏢 Offline'}</span></div>
+                <div><span class="status-badge status-${iv.status}">${iv.status}</span></div>
+                <div>
+                    <span class="email-dot ${iv.email_sent ? 'email-yes' : 'email-no'}"></span>
+                    ${iv.email_sent ? 'Sent' : 'Not sent'}
+                </div>
+            </div>`;
+        }).join('');
+
+        container.innerHTML = `
+        <div class="table-wrap">
+            <div class="interview-header">
+                <div>Candidate</div>
+                <div>Job</div>
+                <div>Date / Time</div>
+                <div>Interviewer</div>
+                <div>Mode</div>
+                <div>Status</div>
+                <div>Email</div>
+            </div>
+            ${rows}
+        </div>`;
+    }
+
+    loadAll();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Add Employee</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* ── Prefill banner ─────────────────────────────────────── */
+        .prefill-banner {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            background: rgba(56,139,253,.10);
+            border: 1.5px solid rgba(56,139,253,.30);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            color: #388BFD;
+            font-weight: 500;
+        }
+        .prefill-banner.show { display: flex; }
+        .prefill-banner b { color: #E6EDF3; }
+        .prefill-banner .dismiss {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #388BFD;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 0 4px;
+        }
+        /* highlight prefilled fields */
+        .prefilled {
+            border-color: rgba(56,139,253,.5) !important;
+            background: rgba(56,139,253,.04) !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="employee-list.html"><span class="icon">👥</span> Employees</a>
+            <a href="add-employee.html" class="active"><span class="icon">➕</span> Add Employee</a>
+            <a href="masters.html"><span class="icon">📋</span> Master Tables</a>
+            <a href="admin-change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">A</div>
+                <div class="user-info">
+                    <p id="user-name">Admin</p>
+                    <span id="user-role">Administrator</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+            <a id="back-btn" href="employee-list.html" class="btn btn-secondary btn-sm">← Back</a>
+            <p class="page-title" style="margin-bottom:0">Add New Employee</p>
+        </div>
+
+        <!-- Kanban prefill notice -->
+        <div class="prefill-banner" id="prefill-banner">
+            🎯 <span id="prefill-msg">Fields pre-filled from Recruitment Board. Review and complete the remaining fields.</span>
+            <button class="dismiss" onclick="dismissBanner()">✕</button>
+        </div>
+
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error" id="error-alert"></div>
+
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Employee Code *</label>
+                    <input type="text" id="employee_code" placeholder="EMP001" />
+                </div>
+                <div class="form-group">
+                    <label>Designation *</label>
+                    <input type="text" id="designation" placeholder="Software Engineer" />
+                </div>
+                <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" id="first_name" placeholder="John" />
+                </div>
+                <div class="form-group">
+                    <label>Last Name *</label>
+                    <input type="text" id="last_name" placeholder="Doe" />
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="email" placeholder="john@synergy.com" />
+                </div>
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="text" id="phone" placeholder="9999999999" />
+                </div>
+                <div class="form-group">
+                    <label>Role *</label>
+                    <select id="role">
+                        <option value="">Select Role</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="department">
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <select id="location">
+                        <option value="">Select Location</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Skills</label>
+                    <select id="skills" multiple style="height:100px">
+                    </select>
+                    <small style="color:#6B7280;font-size:12px">Hold Ctrl to select multiple</small>
+                </div>
+            </div>
+
+            <div style="margin-top:8px;display:flex;gap:12px">
+                <button class="btn btn-primary" onclick="createEmployee()" id="submit-btn">➕ Create Employee</button>
+                <a id="cancel-btn" href="employee-list.html" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div class="modal-overlay" id="success-modal">
+            <div class="modal" style="text-align:center">
+                <div style="font-size:48px;margin-bottom:16px">✅</div>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Employee Created!</h2>
+                <p style="color:#6B7280;margin-bottom:16px">Share this temporary password with the employee:</p>
+                <div style="background:#F3F4F6;border-radius:8px;padding:16px;margin-bottom:20px">
+                    <p style="font-size:24px;font-weight:700;color:#4F46E5;letter-spacing:2px">Temp123</p>
+                </div>
+                <p style="font-size:13px;color:#6B7280;margin-bottom:20px">Employee must change this password on first login.</p>
+                <div style="display:flex;gap:12px;justify-content:center">
+                    <a href="add-employee.html" class="btn btn-primary">Add Another</a>
+                    <a id="success-back-btn" href="employee-list.html" class="btn btn-secondary">View All</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API   = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role  = localStorage.getItem('role_code');
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'ADMIN' && role !== 'HR') window.location.href = 'employee-dashboard.html';
+
+    const name = localStorage.getItem('employee_name') || 'Admin';
+    document.getElementById('user-name').textContent   = name;
+    document.getElementById('user-role').textContent   = localStorage.getItem('role_name') || 'Admin';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    // ── Track where we came from ──────────────────────────────────────────────
+    let cameFromKanban = false;
+
+    // ── Kanban prefill ────────────────────────────────────────────────────────
+    function applyKanbanPrefill() {
+        const raw = localStorage.getItem('prefill_candidate');
+        if (!raw) return;
+
+        let prefill;
+        try { prefill = JSON.parse(raw); } catch { return; }
+        if (!prefill?.from_kanban) return;
+
+        // Clear after reading so it doesn't persist across refreshes
+        localStorage.removeItem('prefill_candidate');
+        cameFromKanban = true;
+
+        const setField = (id, value) => {
+            if (!value) return;
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = value;
+            el.classList.add('prefilled');
+            // Remove highlight on manual edit
+            el.addEventListener('input', () => el.classList.remove('prefilled'), { once: true });
+        };
+
+        setField('first_name',  prefill.first_name);
+        setField('last_name',   prefill.last_name);
+        setField('email',       prefill.email);
+        setField('designation', prefill.designation);
+
+        // Update back button and cancel to go back to kanban
+        document.getElementById('back-btn').href    = 'jrhr-kanban.html';
+        document.getElementById('cancel-btn').href  = 'jrhr-kanban.html';
+        document.getElementById('success-back-btn').href = 'employee-list.html';
+
+        // Show prefill notice
+        const filledFields = [
+            prefill.first_name  ? 'First Name'   : '',
+            prefill.last_name   ? 'Last Name'     : '',
+            prefill.email       ? 'Email'         : '',
+            prefill.designation ? 'Designation'   : '',
+        ].filter(Boolean).join(', ');
+
+        document.getElementById('prefill-msg').innerHTML =
+            `🎯 Pre-filled from Recruitment Board: <b>${filledFields}</b>. Complete the remaining fields to create the account.`;
+        document.getElementById('prefill-banner').classList.add('show');
+    }
+
+    function dismissBanner() {
+        document.getElementById('prefill-banner').classList.remove('show');
+    }
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg;
+        el.classList.add('show');
+        document.getElementById('success-alert').classList.remove('show');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function loadDropdowns() {
+        try {
+            const [deptsRes, locsRes, skillsRes] = await Promise.all([
+                fetch(`${API}/masters/departments/`, { headers: authHeaders() }),
+                fetch(`${API}/masters/locations/`,   { headers: authHeaders() }),
+                fetch(`${API}/masters/skills/`,      { headers: authHeaders() }),
+            ]);
+
+            // Roles — hardcoded from DB
+            const roleSelect  = document.getElementById('role');
+            const knownRoles  = [
+                { id:1, name:'Admin'    },
+                { id:2, name:'HR'       },
+                { id:3, name:'Employee' },
+                { id:4, name:'Manager'  },
+                { id:5, name:'Team Lead'},
+                { id:6, name:'JR_HR'   },
+            ];
+            knownRoles.forEach(r => {
+                roleSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+            });
+            // Default to Employee (id=3) for recruits coming from kanban
+            if (cameFromKanban) roleSelect.value = '3';
+
+            const depts = await deptsRes.json();
+            depts.forEach(d => {
+                document.getElementById('department').innerHTML += `<option value="${d.id}">${d.name}</option>`;
+            });
+
+            const locs = await locsRes.json();
+            locs.forEach(l => {
+                document.getElementById('location').innerHTML += `<option value="${l.id}">${l.name}</option>`;
+            });
+
+            const skills = await skillsRes.json();
+            skills.forEach(s => {
+                document.getElementById('skills').innerHTML += `<option value="${s.id}">${s.name}</option>`;
+            });
+
+        } catch (e) {
+            console.error('Failed to load dropdowns', e);
+        }
+    }
+
+    async function createEmployee() {
+        const btn = document.getElementById('submit-btn');
+        const skillsEl = document.getElementById('skills');
+        const selectedSkills = Array.from(skillsEl.selectedOptions).map(o => parseInt(o.value));
+
+        const body = {
+            employee_code: document.getElementById('employee_code').value.trim(),
+            first_name:    document.getElementById('first_name').value.trim(),
+            last_name:     document.getElementById('last_name').value.trim(),
+            email:         document.getElementById('email').value.trim(),
+            phone:         document.getElementById('phone').value.trim(),
+            designation:   document.getElementById('designation').value.trim(),
+            role:          parseInt(document.getElementById('role').value),
+            department:    parseInt(document.getElementById('department').value) || null,
+            location:      parseInt(document.getElementById('location').value) || null,
+            skills:        selectedSkills,
+            is_active_employee: true,
+        };
+
+        if (!body.employee_code || !body.first_name || !body.email || !body.phone || !body.designation || !body.role) {
+            showError('Please fill all required fields (Employee Code, First Name, Email, Phone, Designation, Role)');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Creating...';
+
+        try {
+            const res  = await fetch(`${API}/accounts/employees/create/`, {
+                method: 'POST', headers: authHeaders(), body: JSON.stringify(body),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                document.getElementById('success-modal').classList.add('show');
+            } else {
+                const errors = Object.values(data).flat().join(', ');
+                showError(errors || 'Failed to create employee');
+            }
+        } catch (e) {
+            showError('Something went wrong. Please try again.');
+        }
+
+        btn.disabled = false;
+        btn.textContent = '➕ Create Employee';
+    }
+
+    // ── Init — prefill must run before loadDropdowns so cameFromKanban is set ─
+    applyKanbanPrefill();
+    loadDropdowns();
+</script>
+</body>
+</html>

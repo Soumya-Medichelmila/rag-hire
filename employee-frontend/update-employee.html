@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Update Employee</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="employee-list.html" class="active"><span class="icon">👥</span> Employees</a>
+            <a href="add-employee.html"><span class="icon">➕</span> Add Employee</a>
+            <a href="masters.html"><span class="icon">📋</span> Master Tables</a>
+            <a href="admin-change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">A</div>
+                <div class="user-info">
+                    <p id="user-name">Admin</p>
+                    <span id="user-role">Administrator</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+            <a href="employee-list.html" class="btn btn-secondary btn-sm">← Back</a>
+            <p class="page-title" style="margin-bottom:0">Update Employee</p>
+        </div>
+
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error" id="error-alert"></div>
+
+        <div class="card" id="form-card">
+            <div class="loading">Loading employee data...</div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role = localStorage.getItem('role_code');
+    const empId = localStorage.getItem('edit_employee_id');
+
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'ADMIN' && role !== 'HR') window.location.href = 'employee-dashboard.html';
+    if (!empId) window.location.href = 'employee-list.html';
+
+    const name = localStorage.getItem('employee_name') || 'Admin';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = localStorage.getItem('role_name') || 'Admin';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('success-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('error-alert').classList.remove('show');
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('success-alert').classList.remove('show');
+    }
+
+    async function loadForm() {
+        try {
+            const [empRes, deptsRes, locsRes, skillsRes] = await Promise.all([
+                fetch(`${API}/accounts/employees/${empId}/`, { headers: authHeaders() }),
+                fetch(`${API}/masters/departments/`, { headers: authHeaders() }),
+                fetch(`${API}/masters/locations/`, { headers: authHeaders() }),
+                fetch(`${API}/masters/skills/`, { headers: authHeaders() }),
+            ]);
+
+            const emp = await empRes.json();
+            const depts = await deptsRes.json();
+            const locs = await locsRes.json();
+            const skills = await skillsRes.json();
+
+            const knownRoles = [
+                     {id:1, name:'Admin'},
+                     {id:2, name:'HR'},
+                     {id:3, name:'Employee'},
+                     {id:4, name:'Manager'},
+                     {id:5, name:'Team Lead'},
+                     {id:6, name:'JR_HR'}
+                ];
+
+            document.getElementById('form-card').innerHTML = `
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Employee Code</label>
+                        <input type="text" id="employee_code" value="${emp.employee_code}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Designation</label>
+                        <input type="text" id="designation" value="${emp.designation}" />
+                    </div>
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="first_name" value="${emp.first_name}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="last_name" value="${emp.last_name}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" value="${emp.email}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="phone" value="${emp.phone}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="role">
+                            ${knownRoles.map(r => `<option value="${r.id}" ${emp.role === r.id ? 'selected' : ''}>${r.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select id="department">
+                            <option value="">Select Department</option>
+                            ${depts.map(d => `<option value="${d.id}" ${emp.department === d.id ? 'selected' : ''}>${d.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select id="location">
+                            <option value="">Select Location</option>
+                            ${locs.map(l => `<option value="${l.id}" ${emp.location === l.id ? 'selected' : ''}>${l.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Skills</label>
+                        <select id="skills" multiple style="height:100px">
+                            ${skills.map(s => `<option value="${s.id}" ${emp.skills.includes(s.id) ? 'selected' : ''}>${s.name}</option>`).join('')}
+                        </select>
+                        <small style="color:#6B7280;font-size:12px">Hold Ctrl to select multiple</small>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;margin-top:8px">
+                    <button class="btn btn-primary" onclick="updateEmployee()" id="submit-btn">💾 Save Changes</button>
+                    <a href="employee-list.html" class="btn btn-secondary">Cancel</a>
+                </div>
+            `;
+        } catch (e) {
+            document.getElementById('form-card').innerHTML = '<div class="loading">Failed to load employee</div>';
+        }
+    }
+
+    async function updateEmployee() {
+        const btn = document.getElementById('submit-btn');
+        const skillsEl = document.getElementById('skills');
+        const selectedSkills = Array.from(skillsEl.selectedOptions).map(o => parseInt(o.value));
+
+        const body = {
+            employee_code: document.getElementById('employee_code').value.trim(),
+            first_name: document.getElementById('first_name').value.trim(),
+            last_name: document.getElementById('last_name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            designation: document.getElementById('designation').value.trim(),
+            role: parseInt(document.getElementById('role').value),
+            department: parseInt(document.getElementById('department').value) || null,
+            location: parseInt(document.getElementById('location').value) || null,
+            skills: selectedSkills,
+        };
+
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+            const res = await fetch(`${API}/accounts/employees/${empId}/update/`, {
+                method: 'PUT', headers: authHeaders(), body: JSON.stringify(body)
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                showSuccess('Employee updated successfully!');
+                setTimeout(() => window.location.href = 'employee-list.html', 1500);
+            } else {
+                const errors = Object.values(data).flat().join(', ');
+                showError(errors || 'Failed to update');
+            }
+        } catch (e) {
+            showError('Something went wrong');
+        }
+
+        btn.disabled = false;
+        btn.textContent = '💾 Save Changes';
+    }
+
+    loadForm();
+</script>
+</body>
+</html>

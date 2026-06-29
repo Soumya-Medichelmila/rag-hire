@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Login</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="login-page">
+    <div class="login-card">
+        <div class="login-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Employee Management System</p>
+        </div>
+        <p class="login-title">Welcome back 👋</p>
+        <div class="alert alert-error" id="error-alert"></div>
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="you@synergy.com" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter your password" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()" id="login-btn">Login</button>
+    </div>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+
+    //  Check if existing token is still valid 
+    function isTokenExpired(token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            //    console.log('Token expires at:', new Date(payload.exp * 1000));
+            return payload.exp * 1000 < Date.now();
+         
+        } catch { return true; }
+    }
+
+    const existingToken = localStorage.getItem('access_token');
+    const existingRole  = localStorage.getItem('role_code');
+
+    if (existingToken && !isTokenExpired(existingToken)) {
+        // Token still valid — redirect to dashboard
+        if (existingRole === 'ADMIN' || existingRole === 'HR') {
+            window.location.href = 'admin-dashboard.html';
+        } else if (existingRole === 'JR_HR') {
+            window.location.href = 'jrhr-dashboard.html';
+        } else {
+            window.location.href = 'employee-dashboard.html';
+        }
+    } else if (existingToken && isTokenExpired(existingToken)) {
+        
+        localStorage.clear();
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('success-alert').classList.remove('show');
+    }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('success-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('error-alert').classList.remove('show');
+    }
+
+    async function doLogin() {
+        const email    = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const btn      = document.getElementById('login-btn');
+
+        if (!email || !password) { showError('Please enter email and password'); return; }
+
+        btn.disabled = true; btn.textContent = 'Logging in...';
+
+        try {
+            const res = await fetch(`${API}/accounts/login/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                localStorage.setItem('access_token',       data.access);
+                localStorage.setItem('refresh_token',      data.refresh);
+                localStorage.setItem('employee_id',        data.employee.id);
+                localStorage.setItem('employee_name',      data.employee.first_name + ' ' + data.employee.last_name);
+                localStorage.setItem('employee_email',     data.employee.email);
+                localStorage.setItem('employee_code',      data.employee.employee_code);
+                localStorage.setItem('role_code',          data.employee.role || '');
+                localStorage.setItem('role_name',          data.employee.role_name || 'Employee');
+                localStorage.setItem('is_password_changed',data.employee.is_password_changed);
+                localStorage.setItem('department_name',    data.employee.department_name || '');
+
+                showSuccess('Login successful! Redirecting...');
+
+                setTimeout(() => {
+                    const role = data.employee.role;
+                    if (role === 'ADMIN' || role === 'HR') {
+                        window.location.href = 'admin-dashboard.html';
+                    } else if (role === 'JR_HR') {
+                        window.location.href = 'jrhr-dashboard.html';
+                    } else {
+                        window.location.href = 'employee-dashboard.html';
+                    }
+                }, 800);
+
+            } else {
+                showError(data.message || 'Invalid credentials');
+            }
+
+        } catch (e) {
+            showError('Cannot connect to server. Is Django running?');
+        }
+
+        btn.disabled = false; btn.textContent = 'Login';
+    }
+
+    document.addEventListener('keypress', (e) => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

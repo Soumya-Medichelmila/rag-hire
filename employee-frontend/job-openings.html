@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Job Openings</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Employee Portal</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="employee-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="raise-vacancy.html"><span class="icon">📝</span> Raise Vacancy</a>
+            <a href="my-requests.html"><span class="icon">📋</span> My Requests</a>
+            <a href="job-openings.html" class="active"><span class="icon">📢</span> Job Openings</a>
+            <a href="change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">E</div>
+                <div class="user-info">
+                    <p id="user-name">Employee</p>
+                    <span id="user-role">Employee</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <p class="page-title">📢 Job Openings</p>
+
+        <div class="search-wrap">
+            <input type="text" id="search-input" placeholder="🔍  Search by title, department, skills..." oninput="filterJobs()" />
+        </div>
+        <div class="results-count" id="results-count"></div>
+        <div id="jobs-container"><div class="loading">Loading job openings...</div></div>
+    </main>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    if (!token) window.location.href = 'index.html';
+
+    const name = localStorage.getItem('employee_name') || 'Employee';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = localStorage.getItem('role_name') || 'Employee';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    let allJobs = [];
+
+    function toListItems(text) {
+        if (!text || !text.trim()) return null;
+        return text.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+
+    function renderSection(title, icon, items, tagClass) {
+        if (!items || items.length === 0) return '';
+        if (tagClass) {
+            return `
+                <div>
+                    <div class="jd-section-title">${icon} ${title}</div>
+                    <div class="skill-tags-row">
+                        ${items.map(i => `<span class="${tagClass}">${i}</span>`).join('')}
+                    </div>
+                </div>`;
+        }
+        return `
+            <div>
+                <div class="jd-section-title">${icon} ${title}</div>
+                <ul class="jd-list">
+                    ${items.map(i => `<li>${i}</li>`).join('')}
+                </ul>
+            </div>`;
+    }
+
+    function renderJobs(jobs) {
+        const container = document.getElementById('jobs-container');
+        const countEl = document.getElementById('results-count');
+        countEl.innerHTML = `Showing <strong>${jobs.length}</strong> open position${jobs.length !== 1 ? 's' : ''}`;
+
+        if (jobs.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size:52px;margin-bottom:16px">📢</div>
+                    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;color:#111827">No job openings found</h3>
+                    <p style="color:#6B7280;font-size:14px">No open positions match your search. Try a different keyword.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = `<div class="jobs-grid">${jobs.map(j => {
+            const respItems    = toListItems(j.responsibilities);
+            const reqItems     = toListItems(j.required_skills_desc);
+            const prefItems    = toListItems(j.preferred_skills);
+            const techItems    = toListItems(j.technologies);
+            const hasStructured = respItems || reqItems || prefItems || techItems || j.role_summary;
+
+            return `
+            <div class="job-card">
+                <div class="job-card-top">
+                    <div class="job-card-title">${j.title}</div>
+                    <div class="job-card-dept">🏢 ${j.department_name}</div>
+                    <div class="job-card-chips">
+                        <span class="top-chip">📍 ${j.location_name || 'Any Location'}</span>
+                        <span class="top-chip">👥 ${j.vacancies} Vacanc${j.vacancies === 1 ? 'y' : 'ies'}</span>
+                        <span class="top-chip">🎯 ${j.experience}</span>
+                    </div>
+                </div>
+
+                <div class="job-card-body">
+                    ${j.role_summary ? `
+                        <div class="jd-full-width">
+                            <div class="jd-section-title">📋 Role Summary</div>
+                            <p class="jd-text">${j.role_summary}</p>
+                        </div>` : (!hasStructured ? `
+                        <div class="jd-full-width">
+                            <div class="jd-section-title">📋 Description</div>
+                            <p class="jd-text">${j.description}</p>
+                        </div>` : '')
+                    }
+                    ${respItems ? `<div class="jd-full-width">${renderSection('Responsibilities', '🛠️', respItems, null)}</div>` : ''}
+                    ${renderSection('Required Skills', '✅', reqItems, 'skill-tag-req')}
+                    ${renderSection('Preferred Skills', '⭐', prefItems, 'skill-tag-pref')}
+                    ${techItems ? `<div class="jd-full-width">${renderSection('Technologies', '💻', techItems, 'skill-tag-tech')}</div>` : ''}
+                    ${j.skill_names && j.skill_names.length > 0 ? `
+                        <div class="jd-full-width">
+                            <div class="jd-section-title">🏷️ Tagged Skills</div>
+                            <div class="skill-tags-row">
+                                ${j.skill_names.map(s => `<span class="skill-tag-req">${s}</span>`).join('')}
+                            </div>
+                        </div>` : ''}
+                </div>
+
+                <div class="job-card-footer">
+                    <span>Posted by <strong>${j.posted_by_name}</strong> · ${new Date(j.posted_at).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'})}</span>
+                    <span class="badge-open">🟢 Open</span>
+                </div>
+            </div>`;
+        }).join('')}</div>`;
+    }
+
+    function filterJobs() {
+        const q = document.getElementById('search-input').value.toLowerCase();
+        if (!q) { renderJobs(allJobs); return; }
+        const filtered = allJobs.filter(j =>
+            j.title.toLowerCase().includes(q) ||
+            j.department_name.toLowerCase().includes(q) ||
+            (j.location_name || '').toLowerCase().includes(q) ||
+            (j.skill_names || []).some(s => s.toLowerCase().includes(q)) ||
+            (j.description || '').toLowerCase().includes(q) ||
+            (j.role_summary || '').toLowerCase().includes(q) ||
+            (j.responsibilities || '').toLowerCase().includes(q) ||
+            (j.required_skills_desc || '').toLowerCase().includes(q) ||
+            (j.preferred_skills || '').toLowerCase().includes(q) ||
+            (j.technologies || '').toLowerCase().includes(q)
+        );
+        renderJobs(filtered);
+    }
+
+    async function loadJobs() {
+        try {
+            const res = await fetch(`${API}/jobs/openings/`, { headers: authHeaders() });
+            if (res.status === 401) { logout(); return; }
+            allJobs = await res.json();
+            renderJobs(allJobs);
+        } catch (e) {
+            document.getElementById('jobs-container').innerHTML = '<div class="loading">Failed to load job openings</div>';
+        }
+    }
+
+    loadJobs();
+</script>
+</body>
+</html>

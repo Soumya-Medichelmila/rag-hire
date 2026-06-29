@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .kanban-quick-card {
+            background: linear-gradient(135deg, #1E1B4B 0%, #312E81 60%, #4338CA 100%);
+            border-radius: 12px; padding: 16px 18px; color: white;
+            display: flex; align-items: center; gap: 14px;
+            text-decoration: none; transition: all .2s;
+            border: 1px solid rgba(99,102,241,.3);
+        }
+        .kanban-quick-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,70,229,.3); }
+        .kanban-quick-card .quick-action-icon { background: rgba(255,255,255,.15) !important; font-size: 20px; }
+        .kanban-quick-card h4 { color: #fff !important; }
+        .kanban-quick-card p  { color: rgba(255,255,255,.75) !important; }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html" class="active"><span class="icon">🏠</span> Dashboard</a>
+            <a href="employee-list.html"><span class="icon">👥</span> Employees</a>
+            <a href="add-employee.html"><span class="icon">➕</span> Add Employee</a>
+            <a href="masters.html"><span class="icon">📋</span> Master Tables</a>
+            <a href="vacancy-requests.html"><span class="icon">📝</span> Vacancy Requests</a>
+            <a href="admin-job-openings.html"><span class="icon">📢</span> Job Openings</a>
+            <a href="hr-screening-results.html"><span class="icon">🎯</span> Screening Results</a>
+            <a href="jrhr-kanban.html"><span class="icon">📋</span> Recruitment Board</a>
+            <a href="admin-change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">A</div>
+                <div class="user-info">
+                    <p id="user-name">Admin</p>
+                    <span id="user-role">Administrator</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="welcome-banner">
+            <div>
+                <h2 id="welcome-text">Welcome back! 👋</h2>
+                <p>Here's what's happening at Synergy today.</p>
+                <span class="time" id="current-time"></span>
+            </div>
+            <div class="welcome-illustration">🏢</div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div>
+                <!-- Stats -->
+                <div class="stats-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:24px">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">👥</div>
+                        <div class="stat-info"><h3 id="total-employees">-</h3><p>Total Employees</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">✅</div>
+                        <div class="stat-info"><h3 id="active-employees">-</h3><p>Active Employees</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">📝</div>
+                        <div class="stat-info"><h3 id="pending-requests">-</h3><p>Pending Requests</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">📢</div>
+                        <div class="stat-info"><h3 id="open-jobs">-</h3><p>Open Jobs</p></div>
+                    </div>
+                    <div class="stat-card" style="grid-column:1/-1;cursor:pointer" onclick="window.location.href='hr-screening-results.html'">
+                        <div class="stat-icon" style="background:#F5F3FF;font-size:22px">🎯</div>
+                        <div class="stat-info">
+                            <h3 id="screened-jobs">-</h3>
+                            <p>Jobs Screened by AI &nbsp;<span style="font-size:11px;color:#6366F1;font-weight:600">→ View Results</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <p style="font-size:16px;font-weight:600;margin-bottom:12px;color:#111827">Quick Actions</p>
+                <div class="quick-actions">
+                    <a href="add-employee.html" class="quick-action-card">
+                        <div class="quick-action-icon" style="background:#EEF2FF">➕</div>
+                        <div><h4>Add Employee</h4><p>Create new employee</p></div>
+                    </a>
+                    <a href="vacancy-requests.html" class="quick-action-card">
+                        <div class="quick-action-icon" style="background:#FEF3C7">📝</div>
+                        <div><h4>Vacancy Requests</h4><p>Review pending requests</p></div>
+                    </a>
+                    <a href="admin-job-openings.html" class="quick-action-card">
+                        <div class="quick-action-icon" style="background:#D1FAE5">📢</div>
+                        <div><h4>Job Openings</h4><p>Manage open positions</p></div>
+                    </a>
+                    <a href="masters.html" class="quick-action-card">
+                        <div class="quick-action-icon" style="background:#FEE2E2">📋</div>
+                        <div><h4>Master Tables</h4><p>Dept, Skills, Location</p></div>
+                    </a>
+                    <a href="hr-screening-results.html" class="quick-action-card">
+                        <div class="quick-action-icon" style="background:#F5F3FF">🎯</div>
+                        <div><h4>Screening Results</h4><p>AI resume matches</p></div>
+                    </a>
+                    <a href="jrhr-kanban.html" class="quick-action-card kanban-quick-card">
+                        <div class="quick-action-icon">📋</div>
+                        <div><h4>Recruitment Board</h4><p>Kanban ATS pipeline</p></div>
+                    </a>
+                </div>
+
+                <!-- Recent Employees -->
+                <div class="card">
+                    <p class="card-title">Recent Employees</p>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>Code</th><th>Name</th><th>Designation</th><th>Status</th></tr>
+                            </thead>
+                            <tbody id="recent-employees">
+                                <tr><td colspan="4" class="loading">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side Profile -->
+            <div class="profile-card-side">
+                <div class="profile-header">
+                    <div class="profile-avatar-large" id="profile-avatar">A</div>
+                    <h3 id="profile-name">Loading...</h3>
+                    <p class="designation" id="profile-designation">-</p>
+                    <span class="badge badge-success">✅ Active</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Employee Code</span>
+                    <span class="value" id="profile-code">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Email</span>
+                    <span class="value" id="profile-email">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Phone</span>
+                    <span class="value" id="profile-phone">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Role</span>
+                    <span class="value" id="profile-role">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Department</span>
+                    <span class="value" id="profile-dept">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Location</span>
+                    <span class="value" id="profile-loc">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Skills</span>
+                    <div class="skills-wrap" id="profile-skills"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API   = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role  = localStorage.getItem('role_code');
+
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'ADMIN' && role !== 'HR') window.location.href = 'employee-dashboard.html';
+
+    const name  = localStorage.getItem('employee_name') || 'Admin';
+    const empId = localStorage.getItem('employee_id');
+    document.getElementById('user-name').textContent       = name;
+    document.getElementById('user-role').textContent       = localStorage.getItem('role_name') || 'Admin';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('welcome-text').textContent    = `Welcome back, ${name.split(' ')[0]}! 👋`;
+
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('current-time').textContent =
+            now.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    }
+    updateTime();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    async function loadDashboard() {
+        try {
+            const [empRes, deptRes, locRes, skillRes, vacRes, jobRes, myRes, screenRes] = await Promise.all([
+                fetch(`${API}/accounts/employees/`,          { headers: authHeaders() }),
+                fetch(`${API}/masters/departments/`,         { headers: authHeaders() }),
+                fetch(`${API}/masters/locations/`,           { headers: authHeaders() }),
+                fetch(`${API}/masters/skills/`,              { headers: authHeaders() }),
+                fetch(`${API}/jobs/vacancy-requests/`,       { headers: authHeaders() }),
+                fetch(`${API}/jobs/openings/`,               { headers: authHeaders() }),
+                fetch(`${API}/accounts/employees/${empId}/`, { headers: authHeaders() }),
+                fetch(`${API}/recruitment/results/`,         { headers: authHeaders() }),
+            ]);
+
+            if (empRes.status === 401) { logout(); return; }
+
+            const employees = await empRes.json();
+            const depts     = await deptRes.json();
+            const locs      = await locRes.json();
+            const skills    = await skillRes.json();
+            const vacancies = await vacRes.json();
+            const jobs      = await jobRes.json();
+            const me        = await myRes.json();
+            const screened  = screenRes.ok ? await screenRes.json() : [];
+
+            const deptMap  = {}; depts.forEach(d  => deptMap[d.id]  = d.name);
+            const locMap   = {}; locs.forEach(l   => locMap[l.id]   = l.name);
+            const skillMap = {}; skills.forEach(s => skillMap[s.id] = s.name);
+
+            const active   = employees.filter(e => e.is_active_employee).length;
+            const pending  = vacancies.filter(v => v.status === 'PENDING').length;
+            const openJobs = jobs.filter(j => j.status === 'OPEN').length;
+
+            document.getElementById('total-employees').textContent  = employees.length;
+            document.getElementById('active-employees').textContent = active;
+            document.getElementById('pending-requests').textContent = pending;
+            document.getElementById('open-jobs').textContent        = openJobs;
+            document.getElementById('screened-jobs').textContent    = screened.length;
+
+            const tbody  = document.getElementById('recent-employees');
+            const recent = employees.slice(-5).reverse();
+            tbody.innerHTML = recent.length === 0
+                ? '<tr><td colspan="4" class="loading">No employees found</td></tr>'
+                : recent.map(e => `
+                    <tr>
+                        <td><strong>${e.employee_code}</strong></td>
+                        <td>${e.first_name} ${e.last_name}</td>
+                        <td>${e.designation}</td>
+                        <td><span class="badge ${e.is_active_employee ? 'badge-success' : 'badge-danger'}">${e.is_active_employee ? 'Active' : 'Inactive'}</span></td>
+                    </tr>`).join('');
+
+            document.getElementById('profile-avatar').textContent      = me.first_name.charAt(0).toUpperCase();
+            document.getElementById('profile-name').textContent        = `${me.first_name} ${me.last_name}`;
+            document.getElementById('profile-designation').textContent = me.designation;
+            document.getElementById('profile-code').textContent        = me.employee_code;
+            document.getElementById('profile-email').textContent       = me.email;
+            document.getElementById('profile-phone').textContent       = me.phone;
+            document.getElementById('profile-role').textContent        = localStorage.getItem('role_name') || '-';
+            document.getElementById('profile-dept').textContent        = me.department ? (deptMap[me.department] || '-') : 'Not assigned';
+            document.getElementById('profile-loc').textContent         = me.location   ? (locMap[me.location]   || '-') : 'Not assigned';
+
+            const skillsEl = document.getElementById('profile-skills');
+            skillsEl.innerHTML = me.skills && me.skills.length > 0
+                ? me.skills.map(sid => `<span class="skill-tag">${skillMap[sid] || sid}</span>`).join('')
+                : '<span style="color:#9CA3AF;font-size:13px">No skills</span>';
+
+        } catch(e) { console.error(e); }
+    }
+
+    loadDashboard();
+</script>
+</body>
+</html>

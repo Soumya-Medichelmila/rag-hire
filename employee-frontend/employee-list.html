@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Employee List</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="employee-list.html" class="active"><span class="icon">👥</span> Employees</a>
+            <a href="add-employee.html"><span class="icon">➕</span> Add Employee</a>
+            <a href="masters.html"><span class="icon">📋</span> Master Tables</a>
+            <a href="admin-change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">A</div>
+                <div class="user-info">
+                    <p id="user-name">Admin</p>
+                    <span id="user-role">Administrator</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+            <p class="page-title" style="margin-bottom:0">Employees</p>
+            <a href="add-employee.html" class="btn btn-primary">➕ Add Employee</a>
+        </div>
+
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error" id="error-alert"></div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Designation</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employee-tbody">
+                        <tr><td colspan="7" class="loading">Loading employees...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role = localStorage.getItem('role_code');
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'ADMIN' && role !== 'HR') window.location.href = 'employee-dashboard.html';
+
+    const name = localStorage.getItem('employee_name') || 'Admin';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = localStorage.getItem('role_name') || 'Admin';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('success-alert');
+        el.textContent = msg; el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg; el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    async function loadEmployees() {
+        try {
+            const res = await fetch(`${API}/accounts/employees/`, { headers: authHeaders() });
+            if (res.status === 401) { logout(); return; }
+            const employees = await res.json();
+            const tbody = document.getElementById('employee-tbody');
+
+            if (employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="loading">No employees found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = employees.map(e => `
+                <tr>
+                    <td><strong>${e.employee_code}</strong></td>
+                    <td>${e.first_name} ${e.last_name}</td>
+                    <td>${e.email}</td>
+                    <td>${e.phone}</td>
+                    <td>${e.designation}</td>
+                    <td>
+                        <span class="badge ${e.is_active_employee ? 'badge-success' : 'badge-danger'}">
+                            ${e.is_active_employee ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td style="display:flex;gap:8px">
+                        <button class="btn btn-warning btn-sm" onclick="editEmployee(${e.id})">✏️ Edit</button>
+                        ${e.is_active_employee
+                            ? `<button class="btn btn-danger btn-sm" onclick="deactivate(${e.id})">🚫 Deactivate</button>`
+                            : '<span style="color:#9CA3AF;font-size:13px">Inactive</span>'
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        } catch (e) {
+            document.getElementById('employee-tbody').innerHTML = '<tr><td colspan="7" class="loading">Failed to load</td></tr>';
+        }
+    }
+
+    function editEmployee(id) {
+        localStorage.setItem('edit_employee_id', id);
+        window.location.href = 'update-employee.html';
+    }
+
+    async function deactivate(id) {
+        if (!confirm('Are you sure you want to deactivate this employee?')) return;
+        try {
+            const res = await fetch(`${API}/accounts/employees/${id}/deactivate/`, {
+                method: 'PATCH', headers: authHeaders()
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showSuccess('Employee deactivated successfully');
+                loadEmployees();
+            } else {
+                showError(data.message || 'Failed to deactivate');
+            }
+        } catch (e) {
+            showError('Something went wrong');
+        }
+    }
+
+    loadEmployees();
+</script>
+</body>
+</html>

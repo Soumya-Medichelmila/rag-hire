@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Vacancy Requests</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="employee-list.html"><span class="icon">👥</span> Employees</a>
+            <a href="add-employee.html"><span class="icon">➕</span> Add Employee</a>
+            <a href="masters.html"><span class="icon">📋</span> Master Tables</a>
+            <a href="vacancy-requests.html" class="active"><span class="icon">📝</span> Vacancy Requests</a>
+            <a href="admin-job-openings.html"><span class="icon">📢</span> Job Openings</a>
+            <a href="admin-change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">A</div>
+                <div class="user-info">
+                    <p id="user-name">Admin</p>
+                    <span id="user-role">Administrator</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <p class="page-title">📝 Vacancy Requests</p>
+
+        <!-- Filter Tabs -->
+        <div class="tabs" style="max-width:400px;margin-bottom:24px">
+            <button class="tab active" onclick="filterRequests('ALL')">All</button>
+            <button class="tab" onclick="filterRequests('PENDING')">⏳ Pending</button>
+            <button class="tab" onclick="filterRequests('ACCEPTED')">✅ Accepted</button>
+            <button class="tab" onclick="filterRequests('REJECTED')">❌ Rejected</button>
+        </div>
+
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error" id="error-alert"></div>
+
+        <div id="requests-container">
+            <div class="loading">Loading requests...</div>
+        </div>
+    </main>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal-overlay" id="reject-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <p class="modal-title">❌ Reject Request</p>
+            <button class="modal-close" onclick="closeRejectModal()">✕</button>
+        </div>
+        <p style="font-size:14px;color:#6B7280;margin-bottom:16px">Please provide a reason for rejection:</p>
+        <div class="form-group">
+            <label>Rejection Reason *</label>
+            <textarea id="rejection-reason" style="width:100%;padding:10px 14px;border:1px solid #D1D5DB;border-radius:8px;font-size:14px;height:100px;outline:none" placeholder="e.g. Budget constraints this quarter..."></textarea>
+        </div>
+        <div style="display:flex;gap:12px">
+            <button class="btn btn-danger" onclick="confirmReject()" id="confirm-reject-btn">❌ Confirm Reject</button>
+            <button class="btn btn-secondary" onclick="closeRejectModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role = localStorage.getItem('role_code');
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'ADMIN' && role !== 'HR') window.location.href = 'employee-dashboard.html';
+
+    const name = localStorage.getItem('employee_name') || 'Admin';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = localStorage.getItem('role_name') || 'Admin';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('success-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('error-alert').classList.remove('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('success-alert').classList.remove('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    let allRequests = [];
+    let rejectId = null;
+
+    function statusBadge(status) {
+        const map = {
+            'PENDING':  { bg: '#FEF3C7', color: '#92400E', icon: '⏳' },
+            'ACCEPTED': { bg: '#D1FAE5', color: '#065F46', icon: '✅' },
+            'REJECTED': { bg: '#FEE2E2', color: '#991B1B', icon: '❌' },
+        };
+        const s = map[status] || { bg: '#F3F4F6', color: '#374151', icon: '' };
+        return `<span style="background:${s.bg};color:${s.color};padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600">${s.icon} ${status}</span>`;
+    }
+
+    function renderRequests(requests) {
+        const container = document.getElementById('requests-container');
+
+        if (requests.length === 0) {
+            container.innerHTML = `
+                <div class="card" style="text-align:center;padding:48px">
+                    <div style="font-size:48px;margin-bottom:16px">📋</div>
+                    <h3 style="font-size:18px;font-weight:600;margin-bottom:8px">No requests found</h3>
+                    <p style="color:#6B7280">No vacancy requests in this category.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = requests.map(r => `
+            <div class="card" style="margin-bottom:16px" id="request-${r.id}">
+                <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+                    <div>
+                        <h3 style="font-size:18px;font-weight:700;margin-bottom:4px">${r.title}</h3>
+                        <p style="color:#6B7280;font-size:13px">
+                            Raised by <strong>${r.requested_by_name}</strong> •
+                            ${new Date(r.created_at).toLocaleDateString('en-IN')}
+                        </p>
+                    </div>
+                    ${statusBadge(r.status)}
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+                    <div style="background:#F9FAFB;padding:12px;border-radius:8px">
+                        <p style="font-size:11px;color:#9CA3AF;margin-bottom:3px">DEPARTMENT</p>
+                        <p style="font-size:13px;font-weight:600">${r.department_name}</p>
+                    </div>
+                    <div style="background:#F9FAFB;padding:12px;border-radius:8px">
+                        <p style="font-size:11px;color:#9CA3AF;margin-bottom:3px">LOCATION</p>
+                        <p style="font-size:13px;font-weight:600">${r.location_name || 'Any'}</p>
+                    </div>
+                    <div style="background:#F9FAFB;padding:12px;border-radius:8px">
+                        <p style="font-size:11px;color:#9CA3AF;margin-bottom:3px">VACANCIES</p>
+                        <p style="font-size:13px;font-weight:600">${r.vacancies}</p>
+                    </div>
+                    <div style="background:#F9FAFB;padding:12px;border-radius:8px">
+                        <p style="font-size:11px;color:#9CA3AF;margin-bottom:3px">EXPERIENCE</p>
+                        <p style="font-size:13px;font-weight:600">${r.experience}</p>
+                    </div>
+                </div>
+
+                ${r.skill_names.length > 0 ? `
+                    <div style="margin-bottom:14px">
+                        <p style="font-size:12px;color:#9CA3AF;font-weight:600;margin-bottom:6px">SKILLS REQUIRED</p>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px">
+                            ${r.skill_names.map(s => `<span style="background:#EEF2FF;color:#4F46E5;padding:3px 10px;border-radius:20px;font-size:12px">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div style="background:#F9FAFB;padding:12px;border-radius:8px;margin-bottom:16px">
+                    <p style="font-size:12px;color:#9CA3AF;font-weight:600;margin-bottom:4px">REASON</p>
+                    <p style="font-size:14px;color:#374151">${r.description}</p>
+                </div>
+
+                ${r.status === 'REJECTED' && r.rejection_reason ? `
+                    <div style="background:#FEE2E2;padding:12px;border-radius:8px;margin-bottom:16px;border:1px solid #FCA5A5">
+                        <p style="font-size:12px;color:#991B1B;font-weight:600;margin-bottom:4px">REJECTION REASON</p>
+                        <p style="font-size:14px;color:#991B1B">${r.rejection_reason}</p>
+                    </div>
+                ` : ''}
+
+                ${r.status === 'ACCEPTED' ? `
+                    <div style="background:#D1FAE5;padding:12px;border-radius:8px;margin-bottom:16px;border:1px solid #6EE7B7">
+                        <p style="font-size:13px;color:#065F46">✅ Accepted by ${r.reviewed_by_name} — Job opening has been posted</p>
+                    </div>
+                ` : ''}
+
+                ${r.status === 'PENDING' ? `
+                    <div style="display:flex;gap:12px">
+                        <button class="btn btn-success" onclick="acceptRequest(${r.id})">✅ Accept & Post Job</button>
+                        <button class="btn btn-danger" onclick="openRejectModal(${r.id})">❌ Reject</button>
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+
+    function filterRequests(status) {
+        document.querySelectorAll('.tab').forEach((btn, i) => {
+            btn.classList.toggle('active', ['ALL','PENDING','ACCEPTED','REJECTED'][i] === status);
+        });
+
+        if (status === 'ALL') {
+            renderRequests(allRequests);
+        } else {
+            renderRequests(allRequests.filter(r => r.status === status));
+        }
+    }
+
+    async function loadRequests() {
+        try {
+            const res = await fetch(`${API}/jobs/vacancy-requests/`, { headers: authHeaders() });
+            if (res.status === 401) { logout(); return; }
+            allRequests = await res.json();
+            renderRequests(allRequests);
+        } catch (e) {
+            document.getElementById('requests-container').innerHTML = '<div class="loading">Failed to load requests</div>';
+        }
+    }
+
+    async function acceptRequest(id) {
+        if (!confirm('Accept this request and post a job opening?')) return;
+        try {
+            const res = await fetch(`${API}/jobs/vacancy-requests/${id}/accept/`, {
+                method: 'PATCH', headers: authHeaders()
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showSuccess('✅ Request accepted! Job opening posted successfully.');
+                loadRequests();
+            } else {
+                showError(data.message || 'Failed to accept');
+            }
+        } catch (e) {
+            showError('Something went wrong');
+        }
+    }
+
+    function openRejectModal(id) {
+        rejectId = id;
+        document.getElementById('rejection-reason').value = '';
+        document.getElementById('reject-modal').classList.add('show');
+    }
+
+    function closeRejectModal() {
+        rejectId = null;
+        document.getElementById('reject-modal').classList.remove('show');
+    }
+
+    async function confirmReject() {
+        const reason = document.getElementById('rejection-reason').value.trim();
+        if (!reason) {
+            alert('Please enter a rejection reason');
+            return;
+        }
+
+        const btn = document.getElementById('confirm-reject-btn');
+        btn.disabled = true;
+        btn.textContent = 'Rejecting...';
+
+        try {
+            const res = await fetch(`${API}/jobs/vacancy-requests/${rejectId}/reject/`, {
+                method: 'PATCH',
+                headers: authHeaders(),
+                body: JSON.stringify({ rejection_reason: reason })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showSuccess('Request rejected successfully');
+                closeRejectModal();
+                loadRequests();
+            } else {
+                showError(data.message || 'Failed to reject');
+            }
+        } catch (e) {
+            showError('Something went wrong');
+        }
+
+        btn.disabled = false;
+        btn.textContent = '❌ Confirm Reject';
+    }
+
+    loadRequests();
+</script>
+</body>
+</html>

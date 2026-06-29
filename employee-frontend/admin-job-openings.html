@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Job Openings (Admin)</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo"><h1>⚡ Synergycom</h1><p>Admin Panel</p></div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="employee-list.html"><span class="icon">👥</span> Employees</a>
+            <a href="add-employee.html"><span class="icon">➕</span> Add Employee</a>
+            <a href="masters.html"><span class="icon">📋</span> Master Tables</a>
+            <a href="vacancy-requests.html"><span class="icon">📝</span> Vacancy Requests</a>
+            <a href="admin-job-openings.html" class="active"><span class="icon">📢</span> Job Openings</a>
+            <a href="admin-change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">A</div>
+                <div class="user-info">
+                    <p id="user-name">Admin</p>
+                    <span id="user-role">Administrator</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <p class="page-title">📢 Job Openings</p>
+
+        <div class="tabs" style="max-width:300px;margin-bottom:24px">
+            <button class="tab active" onclick="filterJobs('ALL')">All</button>
+            <button class="tab" onclick="filterJobs('OPEN')">🟢 Open</button>
+            <button class="tab" onclick="filterJobs('CLOSED')">🔴 Closed</button>
+        </div>
+
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error" id="error-alert"></div>
+
+        <div id="jobs-container"><div class="loading">Loading job openings...</div></div>
+    </main>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <p class="modal-title">✏️ Edit Job Opening</p>
+            <button class="modal-close" onclick="closeEditModal()">✕</button>
+        </div>
+
+        <div class="modal-section-title">🧾 Basic Info</div>
+        <div class="modal-grid">
+            <div class="ef-group ef-full">
+                <label>Job Title *</label>
+                <input type="text" id="edit-title" placeholder="e.g. Python Developer" />
+            </div>
+            <div class="ef-group">
+                <label>Experience Required</label>
+                <input type="text" id="edit-experience" placeholder="e.g. 2-4 years" />
+            </div>
+            <div class="ef-group">
+                <label>Number of Vacancies</label>
+                <input type="number" id="edit-vacancies" min="1" placeholder="e.g. 2" />
+            </div>
+        </div>
+
+        <div class="modal-section-title">🏷️ Skills</div>
+        <div class="skill-chips-wrap" id="edit-skills-container">
+            <span style="color:#9CA3AF;font-size:13px">Loading skills...</span>
+        </div>
+
+        <div class="modal-section-title">📋 Job Description</div>
+
+        <div class="ef-group" style="margin-bottom:14px">
+            <label>Role Summary</label>
+            <textarea id="edit-role-summary" placeholder="Brief overview of what this role is about..."></textarea>
+        </div>
+        <div class="ef-group" style="margin-bottom:14px">
+            <label>Responsibilities</label>
+            <textarea id="edit-responsibilities" style="min-height:120px" placeholder="One responsibility per line:&#10;Develop backend APIs using Django&#10;Implement JWT authentication&#10;..."></textarea>
+            <div class="hint">Enter one item per line — each line becomes a bullet point</div>
+        </div>
+        <div class="ef-group" style="margin-bottom:14px">
+            <label>Required Skills</label>
+            <textarea id="edit-required-skills" style="min-height:100px" placeholder="One skill per line:&#10;Strong knowledge of Python&#10;Experience with Django REST Framework&#10;..."></textarea>
+            <div class="hint">Enter one skill per line</div>
+        </div>
+        <div class="ef-group" style="margin-bottom:14px">
+            <label>Preferred Skills</label>
+            <textarea id="edit-preferred-skills" style="min-height:90px" placeholder="One preferred skill per line:&#10;Experience with Argon2 password hashing&#10;..."></textarea>
+            <div class="hint">Enter one skill per line</div>
+        </div>
+        <div class="ef-group" style="margin-bottom:14px">
+            <label>Technologies</label>
+            <textarea id="edit-technologies" placeholder="One technology per line:&#10;Backend: Python, Django, DRF&#10;Database: PostgreSQL&#10;..."></textarea>
+            <div class="hint">Enter one item per line</div>
+        </div>
+        <div class="ef-group" style="margin-bottom:22px">
+            <label>General Description / Notes</label>
+            <textarea id="edit-description" placeholder="Any additional notes or context about this opening..."></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px">
+            <button class="btn btn-primary" onclick="saveEdit()" id="save-edit-btn">💾 Save Changes</button>
+            <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role = localStorage.getItem('role_code');
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'ADMIN' && role !== 'HR') window.location.href = 'employee-dashboard.html';
+
+    const name = localStorage.getItem('employee_name') || 'Admin';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = localStorage.getItem('role_name') || 'Admin';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }; }
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('success-alert');
+        el.textContent = msg; el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 3500);
+    }
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg; el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    let allJobs = [];
+    let allSkills = [];
+    let editingJobId = null;
+
+    async function loadSkills() {
+        try {
+            const res = await fetch(`${API}/masters/skills/`, { headers: authHeaders() });
+            allSkills = await res.json();
+        } catch (e) { allSkills = []; }
+    }
+
+    function renderEditSkills(selectedNames = []) {
+        const c = document.getElementById('edit-skills-container');
+        if (!allSkills.length) { c.innerHTML = '<span style="color:#9CA3AF;font-size:13px">No skills</span>'; return; }
+        c.innerHTML = allSkills.map(s => `
+            <label class="sk-label ${selectedNames.includes(s.name) ? 'checked' : ''}" data-id="${s.id}" onclick="this.classList.toggle('checked')">
+                <input type="checkbox" value="${s.id}" />
+                ${s.name}
+            </label>`).join('');
+    }
+
+    function getSelectedSkillIds() {
+        return Array.from(document.querySelectorAll('#edit-skills-container .sk-label.checked'))
+            .map(el => parseInt(el.dataset.id));
+    }
+
+    function toItems(text) {
+        if (!text || !text.trim()) return null;
+        return text.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+
+    function renderTagSection(title, icon, items, cls) {
+        if (!items || !items.length) return '';
+        return `<div class="jd-section">
+            <div class="jd-section-title">${icon} ${title}</div>
+            <div class="tags-row">${items.map(i => `<span class="${cls}">${i}</span>`).join('')}</div>
+        </div>`;
+    }
+
+    function renderListSection(title, icon, items) {
+        if (!items || !items.length) return '';
+        return `<div class="jd-section">
+            <div class="jd-section-title">${icon} ${title}</div>
+            <ul class="jd-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>
+        </div>`;
+    }
+
+    function renderJobs(jobs) {
+        const c = document.getElementById('jobs-container');
+        if (!jobs.length) {
+            c.innerHTML = `<div class="card" style="text-align:center;padding:48px">
+                <div style="font-size:48px;margin-bottom:16px">📢</div>
+                <h3 style="font-size:18px;font-weight:600;margin-bottom:8px">No job openings</h3>
+                <p style="color:#6B7280;margin-bottom:20px">Accept vacancy requests to create job openings.</p>
+                <a href="vacancy-requests.html" class="btn btn-primary">📝 View Vacancy Requests</a>
+            </div>`;
+            return;
+        }
+
+        c.innerHTML = jobs.map(j => {
+            const respItems = toItems(j.responsibilities);
+            const reqItems  = toItems(j.required_skills_desc);
+            const prefItems = toItems(j.preferred_skills);
+            const techItems = toItems(j.technologies);
+
+            return `
+            <div class="job-card" id="job-row-${j.id}">
+                <div class="job-card-top">
+                    <div class="jct-row">
+                        <div>
+                            <div class="jct-title">${j.title}</div>
+                            <div class="jct-meta">Posted by <strong>${j.posted_by_name}</strong> · ${new Date(j.posted_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div>
+                        </div>
+                        <span class="status-badge ${j.status==='OPEN'?'status-open':'status-closed'}">${j.status==='OPEN'?'🟢 Open':'🔴 Closed'}</span>
+                    </div>
+                    <div class="top-chips">
+                        <span class="top-chip">🏢 ${j.department_name}</span>
+                        <span class="top-chip">📍 ${j.location_name||'Any'}</span>
+                        <span class="top-chip">👥 ${j.vacancies} Vacanc${j.vacancies===1?'y':'ies'}</span>
+                        <span class="top-chip">🎯 ${j.experience}</span>
+                    </div>
+                </div>
+
+                <div class="job-card-body">
+                    ${j.status==='CLOSED'?`<div class="closed-banner">🔴 Closed on ${new Date(j.closed_at).toLocaleDateString('en-IN')} — Position filled</div>`:''}
+                    ${j.role_summary ? `<div class="jd-section"><div class="jd-section-title">📋 Role Summary</div><p class="jd-text">${j.role_summary}</p></div>` : (!(respItems||reqItems||prefItems||techItems) ? `<div class="jd-section"><div class="jd-section-title">📋 Description</div><p class="jd-text">${j.description}</p></div>` : '')}
+                    ${renderListSection('Responsibilities', '🛠️', respItems)}
+                    ${renderTagSection('Required Skills', '✅', reqItems, 'tag-req')}
+                    ${renderTagSection('Preferred Skills', '⭐', prefItems, 'tag-pref')}
+                    ${renderTagSection('Technologies', '💻', techItems, 'tag-tech')}
+                    ${j.skill_names && j.skill_names.length ? `
+                        <div class="jd-section">
+                            <div class="jd-section-title">🏷️ Tagged Skills</div>
+                            <div class="tags-row">${j.skill_names.map(s=>`<span class="tag-req">${s}</span>`).join('')}</div>
+                        </div>` : ''}
+                </div>
+
+                <div class="job-card-footer">
+                    <button class="btn btn-secondary" onclick="openEditModal(${j.id})" style="font-size:13px">✏️ Edit Job</button>
+                    ${j.status==='OPEN'?`<button class="btn btn-danger" onclick="closeJob(${j.id})" style="font-size:13px">🔴 Mark as Filled & Close</button>`:''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function filterJobs(status) {
+        document.querySelectorAll('.tab').forEach((btn,i) => {
+            btn.classList.toggle('active', ['ALL','OPEN','CLOSED'][i]===status);
+        });
+        renderJobs(status==='ALL' ? allJobs : allJobs.filter(j=>j.status===status));
+    }
+
+    async function loadJobs() {
+        try {
+            const res = await fetch(`${API}/jobs/openings/`, { headers: authHeaders() });
+            if (res.status===401) { logout(); return; }
+            allJobs = await res.json();
+            renderJobs(allJobs);
+        } catch(e) {
+            document.getElementById('jobs-container').innerHTML='<div class="loading">Failed to load</div>';
+        }
+    }
+
+    async function closeJob(id) {
+        if (!confirm('Mark this position as filled and close the job opening?')) return;
+        try {
+            const res = await fetch(`${API}/jobs/openings/${id}/close/`, { method:'PATCH', headers:authHeaders() });
+            const data = await res.json();
+            if (res.ok) { showSuccess('Job opening closed successfully'); loadJobs(); }
+            else showError(data.message||'Failed to close');
+        } catch(e) { showError('Something went wrong'); }
+    }
+
+    function openEditModal(id) {
+        const j = allJobs.find(x=>x.id===id);
+        if (!j) return;
+        editingJobId = id;
+        document.getElementById('edit-title').value = j.title || '';
+        document.getElementById('edit-experience').value = j.experience || '';
+        document.getElementById('edit-vacancies').value = j.vacancies || 1;
+        document.getElementById('edit-role-summary').value = j.role_summary || '';
+        document.getElementById('edit-responsibilities').value = j.responsibilities || '';
+        document.getElementById('edit-required-skills').value = j.required_skills_desc || '';
+        document.getElementById('edit-preferred-skills').value = j.preferred_skills || '';
+        document.getElementById('edit-technologies').value = j.technologies || '';
+        document.getElementById('edit-description').value = j.description || '';
+        renderEditSkills(j.skill_names || []);
+        document.getElementById('edit-modal').classList.add('show');
+    }
+
+    function closeEditModal() {
+        editingJobId = null;
+        document.getElementById('edit-modal').classList.remove('show');
+    }
+
+    async function saveEdit() {
+        if (!editingJobId) return;
+        const btn = document.getElementById('save-edit-btn');
+        const title = document.getElementById('edit-title').value.trim();
+        const description = document.getElementById('edit-description').value.trim();
+        if (!title) { showError('Job title is required'); return; }
+
+        btn.disabled = true; btn.textContent = 'Saving...';
+
+        const body = {
+            title,
+            experience: document.getElementById('edit-experience').value.trim(),
+            vacancies: parseInt(document.getElementById('edit-vacancies').value) || 1,
+            description,
+            role_summary: document.getElementById('edit-role-summary').value.trim(),
+            responsibilities: document.getElementById('edit-responsibilities').value.trim(),
+            required_skills_desc: document.getElementById('edit-required-skills').value.trim(),
+            preferred_skills: document.getElementById('edit-preferred-skills').value.trim(),
+            technologies: document.getElementById('edit-technologies').value.trim(),
+            skills: getSelectedSkillIds(),
+        };
+
+        try {
+            const res = await fetch(`${API}/jobs/openings/${editingJobId}/`, {
+                method: 'PATCH', headers: authHeaders(), body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showSuccess('✅ Job opening updated successfully');
+                closeEditModal();
+                loadJobs();
+            } else {
+                const errors = Object.values(data).flat().join(', ');
+                showError(errors || 'Failed to update');
+            }
+        } catch(e) { showError('Something went wrong'); }
+
+        btn.disabled = false; btn.textContent = '💾 Save Changes';
+    }
+
+    document.getElementById('edit-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeEditModal();
+    });
+
+    async function init() {
+        await loadSkills();
+        await loadJobs();
+    }
+    init();
+</script>
+</body>
+</html>

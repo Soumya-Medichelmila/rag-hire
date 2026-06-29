@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — My Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-grid { display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start; }
+        .welcome-banner { background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%);border-radius:16px;padding:32px;color:white;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between; }
+        .welcome-banner h2 { font-size:26px;font-weight:700;margin-bottom:6px; }
+        .welcome-banner p { font-size:14px;opacity:.85;margin-bottom:16px; }
+        .welcome-banner .time { font-size:13px;opacity:.7; }
+        .welcome-illustration { font-size:80px; }
+        .profile-card-side { background:white;border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.1);position:sticky;top:20px; }
+        .profile-card-side .profile-header { text-align:center;padding-bottom:20px;border-bottom:1px solid #E5E7EB;margin-bottom:20px; }
+        .profile-avatar-large { width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#4F46E5,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:white;margin:0 auto 12px; }
+        .profile-card-side h3 { font-size:17px;font-weight:700;color:#111827;margin-bottom:4px; }
+        .profile-card-side .designation { font-size:13px;color:#6B7280;margin-bottom:8px; }
+        .profile-info-item { display:flex;flex-direction:column;padding:10px 0;border-bottom:1px solid #F3F4F6; }
+        .profile-info-item:last-child { border-bottom:none; }
+        .profile-info-item .label { font-size:11px;color:#9CA3AF;font-weight:600;text-transform:uppercase;margin-bottom:3px; }
+        .profile-info-item .value { font-size:14px;font-weight:500;color:#111827; }
+        .skills-wrap { display:flex;flex-wrap:wrap;gap:6px;margin-top:4px; }
+        .skill-tag { background:#EEF2FF;color:#4F46E5;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500; }
+        .quick-link { display:flex;align-items:center;gap:12px;padding:14px 16px;background:#F9FAFB;border-radius:10px;text-decoration:none;color:inherit;border:1px solid transparent;transition:all .2s;margin-bottom:10px; }
+        .quick-link:hover { border-color:#4F46E5;background:#EEF2FF; }
+        .quick-link .link-icon { font-size:20px;width:36px;height:36px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.1); }
+        .quick-link h4 { font-size:14px;font-weight:600;margin-bottom:2px; }
+        .quick-link p { font-size:12px;color:#6B7280; }
+        .sidebar-divider { font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;padding:8px 20px 4px;letter-spacing:1px; }
+
+        /* HR-specific quick links */
+        .hr-quick-links-heading {
+            font-size:12px;color:#9CA3AF;font-weight:600;text-transform:uppercase;
+            margin:16px 0 10px;padding-top:12px;border-top:1px solid #F3F4F6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Employee Portal</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="employee-dashboard.html" class="active"><span class="icon">🏠</span> Dashboard</a>
+            <a href="raise-vacancy.html"><span class="icon">📝</span> Raise Vacancy</a>
+            <a href="my-requests.html"><span class="icon">📋</span> My Requests</a>
+            <a href="job-openings.html"><span class="icon">📢</span> Job Openings</a>
+            <a href="change-password.html"><span class="icon">🔑</span> Change Password</a>
+
+            <!-- Recruitment dept links -->
+            <div id="recruitment-section" style="display:none">
+                <div class="sidebar-divider">Recruitment</div>
+                <a href="recruitment-resumes.html"><span class="icon">📄</span> Resume Pool</a>
+                <a href="recruitment-screen.html"><span class="icon">🔍</span> Screen Resumes</a>
+            </div>
+
+            <!-- HR role links -->
+            <div id="hr-section" style="display:none">
+                <div class="sidebar-divider">HR Tools</div>
+                <a href="hr-screening-results.html"><span class="icon">📊</span> Screening Results</a>
+                <a href="hr-shortlisted.html"><span class="icon">⭐</span> Shortlisted</a>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">E</div>
+                <div class="user-info">
+                    <p id="user-name">Employee</p>
+                    <span id="user-role">Employee</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="welcome-banner">
+            <div>
+                <h2 id="welcome-text">Welcome back! 👋</h2>
+                <p>Great to see you. Here's your profile summary.</p>
+                <span class="time" id="current-time"></span>
+            </div>
+            <div class="welcome-illustration">👤</div>
+        </div>
+
+        <div class="alert alert-error" id="password-warning" style="display:none;margin-bottom:20px">
+            ⚠️ You are using a temporary password. Please
+            <a href="change-password.html" style="color:inherit;font-weight:600">change your password</a> immediately.
+        </div>
+
+        <div class="dashboard-grid">
+            <div>
+                <div class="card">
+                    <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #F3F4F6">📋 My Details</h3>
+                    <div id="details-loading" class="loading">Loading...</div>
+                    <div id="details-content" style="display:none">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                            <div style="padding:14px;background:#F9FAFB;border-radius:10px">
+                                <p style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:4px;text-transform:uppercase">Employee Code</p>
+                                <p style="font-weight:600" id="detail-code">-</p>
+                            </div>
+                            <div style="padding:14px;background:#F9FAFB;border-radius:10px">
+                                <p style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:4px;text-transform:uppercase">Designation</p>
+                                <p style="font-weight:600" id="detail-designation">-</p>
+                            </div>
+                            <div style="padding:14px;background:#F9FAFB;border-radius:10px">
+                                <p style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:4px;text-transform:uppercase">Department</p>
+                                <p style="font-weight:600" id="detail-dept">-</p>
+                            </div>
+                            <div style="padding:14px;background:#F9FAFB;border-radius:10px">
+                                <p style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:4px;text-transform:uppercase">Location</p>
+                                <p style="font-weight:600" id="detail-loc">-</p>
+                            </div>
+                            <div style="padding:14px;background:#F9FAFB;border-radius:10px;grid-column:1/-1">
+                                <p style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:8px;text-transform:uppercase">Skills</p>
+                                <div class="skills-wrap" id="detail-skills"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #F3F4F6">⚡ Quick Actions</h3>
+
+                    <!-- Common links for everyone -->
+                    <a href="raise-vacancy.html" class="quick-link">
+                        <div class="link-icon">📝</div>
+                        <div><h4>Raise Vacancy Request</h4><p>Request when someone resigns</p></div>
+                    </a>
+                    <a href="my-requests.html" class="quick-link">
+                        <div class="link-icon">📋</div>
+                        <div><h4>My Requests</h4><p>Track your vacancy requests</p></div>
+                    </a>
+                    <a href="job-openings.html" class="quick-link">
+                        <div class="link-icon">📢</div>
+                        <div><h4>Job Openings</h4><p>View all open positions</p></div>
+                    </a>
+                    <a href="change-password.html" class="quick-link">
+                        <div class="link-icon">🔑</div>
+                        <div><h4>Change Password</h4><p>Update your password</p></div>
+                    </a>
+
+                    <!-- Recruitment dept extra links -->
+                    <div id="recruitment-quick-links" style="display:none">
+                        <div class="hr-quick-links-heading">Recruitment Tools</div>
+                        <a href="recruitment-resumes.html" class="quick-link">
+                            <div class="link-icon">📄</div>
+                            <div><h4>Resume Pool</h4><p>Upload & manage resumes</p></div>
+                        </a>
+                        <a href="recruitment-screen.html" class="quick-link">
+                            <div class="link-icon">🔍</div>
+                            <div><h4>Screen Resumes</h4><p>AI-powered resume screening</p></div>
+                        </a>
+                    </div>
+
+                    <!-- HR role extra links -->
+                    <div id="hr-quick-links" style="display:none">
+                        <div class="hr-quick-links-heading">HR Tools</div>
+                        <a href="hr-screening-results.html" class="quick-link">
+                            <div class="link-icon">📊</div>
+                            <div><h4>Screening Results</h4><p>View & shortlist candidates</p></div>
+                        </a>
+                        <a href="hr-shortlisted.html" class="quick-link">
+                            <div class="link-icon">⭐</div>
+                            <div><h4>Shortlisted Candidates</h4><p>See who you've shortlisted</p></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side Profile -->
+            <div class="profile-card-side">
+                <div class="profile-header">
+                    <div class="profile-avatar-large" id="profile-avatar">E</div>
+                    <h3 id="profile-name">Loading...</h3>
+                    <p class="designation" id="profile-designation">-</p>
+                    <span class="badge badge-success" id="profile-status">✅ Active</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Email</span>
+                    <span class="value" id="profile-email">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Phone</span>
+                    <span class="value" id="profile-phone">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Role</span>
+                    <span class="value" id="profile-role">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Department</span>
+                    <span class="value" id="profile-dept-card">-</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="label">Status</span>
+                    <span class="value" id="profile-active">-</span>
+                </div>
+                <div style="margin-top:16px">
+                    <a href="change-password.html" class="btn btn-primary btn-full">🔑 Change Password</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    if (!token) window.location.href = 'index.html';
+
+    const name       = localStorage.getItem('employee_name') || 'Employee';
+    const empId      = localStorage.getItem('employee_id');
+    const deptName   = localStorage.getItem('department_name') || '';
+    const roleCode   = localStorage.getItem('role_code') || '';
+    const roleName   = localStorage.getItem('role_name') || 'Employee';
+
+    // ── Redirect JR_HR away from this page ──────────────────────────────────
+    if (roleCode === 'JR_HR') {
+        window.location.href = 'jrhr-dashboard.html';
+    }
+
+    // ── Sidebar user info ────────────────────────────────────────────────────
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = roleName;
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('welcome-text').textContent = `Welcome back, ${name.split(' ')[0]}! 👋`;
+
+    // ── Show Recruitment section (dept-based) ────────────────────────────────
+    if (deptName.trim().toUpperCase() === 'RECRUITMENT') {
+        document.getElementById('recruitment-section').style.display = 'block';
+        document.getElementById('recruitment-quick-links').style.display = 'block';
+    }
+
+    // ── Show HR section (role-based) ─────────────────────────────────────────
+    if (roleCode === 'HR' || roleCode === 'ADMIN') {
+        document.getElementById('hr-section').style.display = 'block';
+        document.getElementById('hr-quick-links').style.display = 'block';
+    }
+
+    function updateTime() {
+        document.getElementById('current-time').textContent =
+            new Date().toLocaleDateString('en-IN', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+    }
+    updateTime();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'index.html';
+    }
+
+    async function loadProfile() {
+        try {
+            const [empRes, deptsRes, locsRes, skillsRes] = await Promise.all([
+                fetch(`${API}/accounts/employees/${empId}/`, { headers: authHeaders() }),
+                fetch(`${API}/masters/departments/`,         { headers: authHeaders() }),
+                fetch(`${API}/masters/locations/`,           { headers: authHeaders() }),
+                fetch(`${API}/masters/skills/`,              { headers: authHeaders() }),
+            ]);
+
+            if (empRes.status === 401) { logout(); return; }
+
+            const emp    = await empRes.json();
+            const depts  = await deptsRes.json();
+            const locs   = await locsRes.json();
+            const skills = await skillsRes.json();
+
+            const deptMap  = {}; depts.forEach(d  => deptMap[d.id]  = d.name);
+            const locMap   = {}; locs.forEach(l   => locMap[l.id]   = l.name);
+            const skillMap = {}; skills.forEach(s => skillMap[s.id] = s.name);
+
+            const deptNameResolved = emp.department ? (deptMap[emp.department] || 'Not assigned') : 'Not assigned';
+            const locName          = emp.location   ? (locMap[emp.location]    || 'Not assigned') : 'Not assigned';
+
+            if (localStorage.getItem('is_password_changed') === 'false') {
+                document.getElementById('password-warning').style.display = 'block';
+            }
+
+            // Right profile card
+            document.getElementById('profile-avatar').textContent      = emp.first_name.charAt(0).toUpperCase();
+            document.getElementById('profile-name').textContent         = `${emp.first_name} ${emp.last_name}`;
+            document.getElementById('profile-designation').textContent  = emp.designation;
+            document.getElementById('profile-email').textContent        = emp.email;
+            document.getElementById('profile-phone').textContent        = emp.phone;
+            document.getElementById('profile-role').textContent         = roleName;
+            document.getElementById('profile-dept-card').textContent    = deptNameResolved;
+            document.getElementById('profile-active').textContent       = emp.is_active_employee ? '✅ Active' : '❌ Inactive';
+
+            // Left details
+            document.getElementById('details-loading').style.display  = 'none';
+            document.getElementById('details-content').style.display  = 'block';
+            document.getElementById('detail-code').textContent        = emp.employee_code;
+            document.getElementById('detail-designation').textContent = emp.designation;
+            document.getElementById('detail-dept').textContent        = deptNameResolved;
+            document.getElementById('detail-loc').textContent         = locName;
+
+            const skillsEl = document.getElementById('detail-skills');
+            skillsEl.innerHTML = emp.skills && emp.skills.length > 0
+                ? emp.skills.map(sid => `<span class="skill-tag">${skillMap[sid] || sid}</span>`).join('')
+                : '<span style="color:#9CA3AF;font-size:14px">No skills assigned</span>';
+
+        } catch(e) {
+            document.getElementById('details-loading').textContent = 'Failed to load. Please refresh.';
+            console.error(e);
+        }
+    }
+
+    loadProfile();
+</script>
+
+</body>
+</html>

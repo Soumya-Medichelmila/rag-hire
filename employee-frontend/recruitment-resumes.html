@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Synergy — Resume Pool</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .sidebar-divider { font-size:10px; color:#6B7280; font-weight:600; text-transform:uppercase; padding:8px 20px 4px; letter-spacing:1px; }
+
+        /* ── Stats ── */
+        .stats-row { display:flex; gap:14px; margin-bottom:24px; flex-wrap:wrap; }
+        .stat-card  { background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:16px 20px; flex:1; min-width:120px; display:flex; align-items:center; gap:12px; }
+        .stat-icon  { font-size:20px; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .stat-icon.green   { background:#ECFDF5; }
+        .stat-icon.indigo  { background:#EEF2FF; }
+        .stat-icon.emerald { background:#D1FAE5; }
+        .stat-icon.amber   { background:#FFFBEB; }
+        .stat-number        { font-size:24px; font-weight:800; line-height:1; }
+        .stat-number.green  { color:#059669; }
+        .stat-number.indigo { color:#4F46E5; }
+        .stat-number.emerald{ color:#065F46; }
+        .stat-number.amber  { color:#D97706; }
+        .stat-label { font-size:11px; color:#6B7280; font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+
+        /* ── Toolbar ── */
+        .toolbar { display:flex; gap:10px; margin-bottom:20px; align-items:center; flex-wrap:wrap; }
+        .search-box {
+            flex:1; min-width:200px; padding:9px 14px 9px 36px;
+            border:1px solid #E5E7EB; border-radius:8px; font-size:13px; color:#111827;
+            background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+            outline:none;
+        }
+        .search-box:focus { border-color:#6366F1; box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+        .filter-btn { padding:8px 16px; border:1px solid #E5E7EB; border-radius:8px; background:#fff; font-size:12px; font-weight:600; color:#374151; cursor:pointer; transition:all .15s; }
+        .filter-btn:hover, .filter-btn.active { background:#4F46E5; color:#fff; border-color:#4F46E5; }
+        .count-label { font-size:12px; color:#9CA3AF; margin-left:auto; }
+
+        /* ── Card List ── */
+        .cards-list { display:flex; flex-direction:column; gap:12px; }
+
+        /* ── Candidate Card ── */
+        .candidate-card {
+            background:#fff;
+            border:1px solid #E5E7EB;
+            border-radius:14px;
+            padding:18px 22px;
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            transition:box-shadow .15s, border-color .15s;
+        }
+        .candidate-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.07); border-color:#C7D2FE; }
+
+        /* top row: avatar + name + badges */
+        .card-top {
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+        .card-avatar {
+            width:46px; height:46px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:16px; font-weight:800; color:#fff;
+            flex-shrink:0; letter-spacing:-.5px;
+        }
+        .card-name-wrap { flex:1; min-width:0; }
+        .card-name  { font-size:15px; font-weight:700; color:#111827; }
+        .card-sub   { font-size:11px; color:#9CA3AF; margin-top:2px; }
+        .card-badges { display:flex; gap:6px; flex-shrink:0; flex-wrap:wrap; }
+        .badge { padding:4px 10px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.3px; }
+        .badge-shortlisted { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
+        .badge-pending     { background:#F9FAFB; color:#6B7280; border:1px solid #E5E7EB; }
+
+        /* divider */
+        .card-divider { border:none; border-top:1px solid #F3F4F6; }
+
+        /* middle row: contact info */
+        .card-contact {
+            display:flex;
+            gap:24px;
+            flex-wrap:wrap;
+        }
+        .contact-item {
+            display:flex;
+            align-items:center;
+            gap:7px;
+            font-size:13px;
+            color:#374151;
+        }
+        .contact-item .ico { font-size:14px; flex-shrink:0; }
+        .contact-item a { color:#4F46E5; text-decoration:none; font-weight:500; }
+        .contact-item a:hover { text-decoration:underline; }
+        .contact-muted { color:#9CA3AF; }
+
+        /* bottom row: date + actions */
+        .card-footer {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+        .card-date { font-size:11px; color:#9CA3AF; }
+
+        .card-actions { display:flex; gap:8px; }
+        .btn-view {
+            padding:7px 18px; border-radius:8px; font-size:12px; font-weight:700;
+            cursor:pointer; border:1px solid #C7D2FE; background:#EEF2FF; color:#4F46E5; transition:all .15s;
+        }
+        .btn-view:hover { background:#4F46E5; color:#fff; border-color:#4F46E5; }
+        .btn-del {
+            padding:7px 18px; border-radius:8px; font-size:12px; font-weight:700;
+            cursor:pointer; border:1px solid #FCA5A5; background:#FEE2E2; color:#DC2626; transition:all .15s;
+        }
+        .btn-del:hover { background:#DC2626; color:#fff; border-color:#DC2626; }
+
+        /* upload CTA */
+        .upload-cta { display:inline-flex; align-items:center; gap:8px; background:#059669; color:#fff; font-weight:700; font-size:13px; padding:10px 20px; border-radius:9px; text-decoration:none; transition:opacity .15s; }
+        .upload-cta:hover { opacity:.88; }
+
+        /* empty */
+        .empty-state { text-align:center; padding:60px 20px; color:#9CA3AF; font-size:13px; }
+        .empty-state .empty-icon { font-size:40px; margin-bottom:12px; }
+
+        /* ── Modal ── */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1000; align-items:center; justify-content:center; }
+        .modal-overlay.open { display:flex; }
+        .modal-box { background:#fff; border-radius:14px; width:90vw; height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,.3); }
+        .modal-header { padding:14px 20px; border-bottom:1px solid #E5E7EB; display:flex; justify-content:space-between; align-items:center; background:#F9FAFB; }
+        .modal-header span { font-weight:700; font-size:14px; color:#111827; }
+        .modal-close { background:#EF4444; color:#fff; border:none; border-radius:7px; padding:6px 14px; cursor:pointer; font-weight:700; font-size:12px; }
+        .modal-body  { flex:1; overflow:hidden; }
+        .modal-body iframe { width:100%; height:100%; border:none; }
+        .modal-loading { padding:40px; text-align:center; color:#6B7280; font-size:13px; }
+
+        /* ── Toast ── */
+        .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:600; z-index:9999; display:none; max-width:320px; }
+        .toast.show    { display:block; }
+        .toast.success { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
+        .toast.error   { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo"><h1>⚡ Synergycom</h1><p>Employee Portal</p></div>
+        <nav class="sidebar-nav">
+            <a href="employee-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="raise-vacancy.html"><span class="icon">📝</span> Raise Vacancy</a>
+            <a href="my-requests.html"><span class="icon">📋</span> My Requests</a>
+            <a href="job-openings.html"><span class="icon">📢</span> Job Openings</a>
+            <a href="change-password.html"><span class="icon">🔑</span> Change Password</a>
+            <div class="sidebar-divider">Recruitment</div>
+            <a href="recruitment-resumes.html" class="active"><span class="icon">📄</span> Resume Pool</a>
+            <a href="recruitment-screen.html"><span class="icon">🔍</span> Screen Resumes</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">R</div>
+                <div class="user-info"><p id="user-name">Recruiter</p><span id="user-role">Recruitment</span></div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+            <p class="page-title" style="margin:0">📄 Resume Pool</p>
+            <a href="recruitment-screen.html" class="upload-cta">＋ Upload Resumes</a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon green">👥</div>
+                <div><div class="stat-number green" id="stat-total">—</div><div class="stat-label">Total</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon indigo">🧮</div>
+                <div><div class="stat-number indigo" id="stat-embedded">—</div><div class="stat-label">In Vector DB</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon emerald">⭐</div>
+                <div><div class="stat-number emerald" id="stat-shortlisted">—</div><div class="stat-label">Shortlisted</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber">📧</div>
+                <div><div class="stat-number amber" id="stat-with-email">—</div><div class="stat-label">With Email</div></div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <input class="search-box" id="search-input" type="text"
+                   placeholder="Search by name or email…" oninput="renderCards()">
+            <button class="filter-btn active" id="filter-all"         onclick="setFilter('all')">All</button>
+            <button class="filter-btn"        id="filter-shortlisted" onclick="setFilter('shortlisted')">Shortlisted</button>
+            <button class="filter-btn"        id="filter-pending"     onclick="setFilter('pending')">Pending</button>
+            <span class="count-label" id="count-label"></span>
+        </div>
+
+        <!-- Cards -->
+        <div class="cards-list" id="cards-list">
+            <div class="empty-state"><div class="empty-icon">⏳</div>Loading candidates…</div>
+        </div>
+    </main>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal-overlay" id="preview-modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span id="modal-title">Resume Preview</span>
+            <button class="modal-close" onclick="closePreview()">✕ Close</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="modal-loading">Loading resume…</div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const API   = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const dept  = localStorage.getItem('department_name') || '';
+    if (!token) window.location.href = 'index.html';
+    if (dept.trim().toUpperCase() !== 'RECRUITMENT') {
+        alert('Access denied. Only Recruitment department members can access this page.');
+        window.location.href = 'employee-dashboard.html';
+    }
+
+    const uname = localStorage.getItem('employee_name') || 'Recruiter';
+    document.getElementById('user-name').textContent       = uname;
+    document.getElementById('user-role').textContent       = localStorage.getItem('role_name') || 'Recruitment';
+    document.getElementById('avatar-initials').textContent = uname.charAt(0).toUpperCase();
+
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+    function authHeaders() { return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }; }
+
+    function showToast(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.className = `toast ${type} show`;
+        setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function esc(str) { return (str||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+    function cleanName(n) { return (n||'').replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim(); }
+    function initials(name) {
+        const p = name.trim().split(' ').filter(Boolean);
+        return p.length >= 2 ? (p[0][0]+p[1][0]).toUpperCase() : (p[0]||'?')[0].toUpperCase();
+    }
+
+    const GRADIENTS = [
+        ['#6366F1','#8B5CF6'],['#059669','#10B981'],['#D97706','#F59E0B'],
+        ['#DC2626','#F87171'],['#0891B2','#06B6D4'],['#7C3AED','#A78BFA'],
+        ['#B45309','#D97706'],['#065F46','#059669'],
+    ];
+    function grad(id) { const g=GRADIENTS[id%GRADIENTS.length]; return `linear-gradient(135deg,${g[0]},${g[1]})`; }
+
+    let allCandidates = [];
+    let activeFilter  = 'all';
+
+    async function loadCandidates() {
+        try {
+            const res  = await fetch(`${API}/recruitment/candidates/`, { headers: authHeaders() });
+            const data = await res.json();
+            allCandidates = Array.isArray(data) ? data : (data.candidates || []);
+
+            document.getElementById('stat-total').textContent       = allCandidates.length;
+            document.getElementById('stat-embedded').textContent    = allCandidates.filter(c=>c.is_embedded).length;
+            document.getElementById('stat-shortlisted').textContent = allCandidates.filter(c=>c.is_shortlisted).length;
+            document.getElementById('stat-with-email').textContent  = allCandidates.filter(c=>c.email).length;
+
+            renderCards();
+        } catch(e) {
+            document.getElementById('cards-list').innerHTML =
+                '<div class="empty-state"><div class="empty-icon">⚠️</div>Failed to load. Is the server running?</div>';
+        }
+    }
+
+    function setFilter(f) {
+        activeFilter = f;
+        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+        document.getElementById('filter-'+f).classList.add('active');
+        renderCards();
+    }
+
+    function renderCards() {
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+        const list  = allCandidates.filter(c => {
+            if (activeFilter==='shortlisted' && !c.is_shortlisted) return false;
+            if (activeFilter==='pending'      &&  c.is_shortlisted) return false;
+            if (query) {
+                const hay = [c.full_name, c.email, c.phone]
+                    .map(v=>(v||'').toLowerCase()).join(' ');
+                if (!hay.includes(query)) return false;
+            }
+            return true;
+        });
+
+        document.getElementById('count-label').textContent =
+            `${list.length} candidate${list.length!==1?'s':''}`;
+
+        const container = document.getElementById('cards-list');
+
+        if (!list.length) {
+            container.innerHTML = `<div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                ${query||activeFilter!=='all'
+                    ? 'No candidates match your filter.'
+                    : 'No candidates yet.<br><br><a href="recruitment-screen.html" style="color:#059669;font-weight:700">→ Upload resumes to get started</a>'}
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = list.map(c => {
+            const name        = cleanName(c.full_name) || 'Unknown';
+            const previewFile = c.sharepoint_filename || c.source_filename || '';
+            const dateStr     = c.created_at
+                ? new Date(c.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+                : '—';
+
+            return `
+            <div class="candidate-card" id="card-${c.id}">
+
+                <!-- Top: avatar + name + status badge -->
+                <div class="card-top">
+                    <div class="card-avatar" style="background:${grad(c.id)}">${initials(name)}</div>
+                    <div class="card-name-wrap">
+                        <div class="card-name">${name}</div>
+                        <div class="card-sub">Candidate #${c.id}</div>
+                    </div>
+                    <div class="card-badges">
+                        ${c.is_shortlisted
+                            ? '<span class="badge badge-shortlisted">⭐ Shortlisted</span>'
+                            : '<span class="badge badge-pending">⏳ Pending</span>'}
+                    </div>
+                </div>
+
+                <hr class="card-divider">
+
+                <!-- Middle: email + phone -->
+                <div class="card-contact">
+                    <div class="contact-item">
+                        <span class="ico">📧</span>
+                        ${c.email
+                            ? `<a href="mailto:${c.email}">${c.email}</a>`
+                            : '<span class="contact-muted">No email on record</span>'}
+                    </div>
+                    <div class="contact-item">
+                        <span class="ico">📞</span>
+                        ${c.phone
+                            ? `<a href="tel:${c.phone}" style="color:#374151;font-weight:500">${c.phone}</a>`
+                            : '<span class="contact-muted">No phone on record</span>'}
+                    </div>
+                </div>
+
+                <hr class="card-divider">
+
+                <!-- Footer: date + actions -->
+                <div class="card-footer">
+                    <span class="card-date">📅 Uploaded ${dateStr}</span>
+                    <div class="card-actions">
+                        ${previewFile
+                            ? `<button class="btn-view" onclick="previewResume('${esc(previewFile)}','${esc(name)}')">👁 View Resume</button>`
+                            : ''}
+                        <button class="btn-del" onclick="deleteCandidate(${c.id},'${esc(name)}')">🗑 Delete</button>
+                    </div>
+                </div>
+
+            </div>`;
+        }).join('');
+    }
+
+    async function deleteCandidate(id, name) {
+        if (!confirm(`Delete "${name}"?\n\nThis removes the candidate record, embeddings, and file. This cannot be undone.`)) return;
+        try {
+            const res = await fetch(`${API}/recruitment/candidates/${id}/`, {
+                method:'DELETE', headers: authHeaders()
+            });
+            if (res.ok || res.status===204) {
+                allCandidates = allCandidates.filter(c=>c.id!==id);
+                document.getElementById('stat-total').textContent       = allCandidates.length;
+                document.getElementById('stat-embedded').textContent    = allCandidates.filter(c=>c.is_embedded).length;
+                document.getElementById('stat-shortlisted').textContent = allCandidates.filter(c=>c.is_shortlisted).length;
+                document.getElementById('stat-with-email').textContent  = allCandidates.filter(c=>c.email).length;
+                renderCards();
+                showToast(`✅ "${name}" deleted successfully`);
+            } else {
+                const err = await res.json().catch(()=>({}));
+                showToast(`❌ Delete failed: ${err.error||res.statusText}`, 'error');
+            }
+        } catch(e) { showToast(`❌ ${e.message}`, 'error'); }
+    }
+
+    async function previewResume(filename, candidateName) {
+        if (!filename) return;
+        document.getElementById('modal-title').textContent = `Resume — ${candidateName}`;
+        document.getElementById('modal-body').innerHTML    = '<div class="modal-loading">⏳ Loading resume…</div>';
+        document.getElementById('preview-modal').classList.add('open');
+        try {
+            const url = `${API}/recruitment/resume-preview/?filename=${encodeURIComponent(filename)}`;
+            const res = await fetch(url, { headers:{ 'Authorization':`Bearer ${token}` } });
+            if (!res.ok) {
+                const err = await res.json().catch(()=>({error:res.statusText}));
+                document.getElementById('modal-body').innerHTML =
+                    `<div class="modal-loading" style="color:#EF4444">❌ ${err.error||res.statusText}</div>`;
+                return;
+            }
+            const blob    = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const ext     = filename.split('.').pop().toLowerCase();
+            document.getElementById('modal-body').innerHTML = ext==='pdf'
+                ? `<iframe src="${blobUrl}" title="Resume Preview"></iframe>`
+                : `<div class="modal-loading">
+                       <p style="margin-bottom:16px">📄 DOCX files can't be previewed in-browser.</p>
+                       <a href="${blobUrl}" download="${filename}"
+                          style="background:#4F46E5;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700">
+                          ⬇️ Download ${filename}
+                       </a>
+                   </div>`;
+        } catch(e) {
+            document.getElementById('modal-body').innerHTML =
+                `<div class="modal-loading" style="color:#EF4444">❌ ${e.message}</div>`;
+        }
+    }
+
+    function closePreview() {
+        document.getElementById('preview-modal').classList.remove('open');
+        document.getElementById('modal-body').innerHTML = '';
+    }
+    document.getElementById('preview-modal').addEventListener('click', function(e) {
+        if (e.target===this) closePreview();
+    });
+
+    loadCandidates();
+</script>
+</body>
+</html>

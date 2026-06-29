@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synergy — Recruitment Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Tokens ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0D1117;
+  --surface:   #161B22;
+  --surface2:  #1C2128;
+  --surface3:  #21262D;
+  --border:    #30363D;
+  --border2:   #444C56;
+  --text:      #E6EDF3;
+  --text2:     #8B949E;
+  --text3:     #484F58;
+  --blue:      #388BFD;
+  --blue-bg:   rgba(56,139,253,.12);
+  --purple:    #A371F7;
+  --purple-bg: rgba(163,113,247,.12);
+  --green:     #3FB950;
+  --green-bg:  rgba(63,185,80,.12);
+  --red:       #F85149;
+  --red-bg:    rgba(248,81,73,.12);
+  --orange:    #D29922;
+  --orange-bg: rgba(210,153,34,.12);
+  --radius:    12px;
+  --font:      'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ─── Layout wrapper ────────────────────────────────────────────────────── */
+.layout { display: flex; flex: 1; height: 100vh; overflow: hidden; }
+
+/* ─── Sidebar ───────────────────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo h1 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+.sidebar-logo p { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+.sidebar-nav { flex: 1; padding: 12px 8px; }
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  text-decoration: none;
+  margin-bottom: 2px;
+  transition: all .15s;
+}
+.sidebar-nav a:hover { background: var(--surface3); color: var(--text); }
+.sidebar-nav a.active { background: var(--blue-bg); color: var(--blue); font-weight: 600; }
+.sidebar-nav a .icon { font-size: 15px; }
+
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.user-info p { font-size: 12px; font-weight: 600; color: var(--text); }
+.user-info span { font-size: 10px; color: var(--text2); }
+.logout-btn {
+  width: 100%;
+  background: var(--red-bg);
+  border: 1px solid rgba(248,81,73,.25);
+  color: var(--red);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.logout-btn:hover { background: var(--red); color: #fff; }
+
+/* ─── Main ──────────────────────────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ─── Topbar ────────────────────────────────────────────────────────────── */
+.topbar {
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+.topbar-title { font-size: 15px; font-weight: 700; color: var(--text); }
+
+.job-select {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  outline: none;
+  min-width: 200px;
+  max-width: 280px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.job-select:focus { border-color: var(--blue); }
+.job-select option { background: var(--surface2); }
+
+.topbar-stats {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.stat-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.stat-chip b { color: var(--text); }
+
+/* ─── Board wrapper ─────────────────────────────────────────────────────── */
+.board-wrap {
+  flex: 1;
+  padding: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+}
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 280px);
+  gap: 12px;
+  height: 100%;
+  min-width: max-content;
+}
+
+/* ─── Column ────────────────────────────────────────────────────────────── */
+.col {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.col.drag-over { border-color: var(--blue); }
+
+.col-head {
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.col-stripe {
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.col[data-col="SHORTLISTED"] .col-stripe { background: var(--blue); }
+.col[data-col="SCHEDULED"]   .col-stripe { background: var(--purple); }
+.col[data-col="HIRED"]       .col-stripe { background: var(--green); }
+.col[data-col="REJECTED"]    .col-stripe { background: var(--red); }
+
+.col-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  flex: 1;
+}
+.col[data-col="SHORTLISTED"] .col-label { color: var(--blue); }
+.col[data-col="SCHEDULED"]   .col-label { color: var(--purple); }
+.col[data-col="HIRED"]       .col-label { color: var(--green); }
+.col[data-col="REJECTED"]    .col-label { color: var(--red); }
+
+.col-count {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--surface3);
+  color: var(--text2);
+}
+
+.col-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ─── Card ──────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: grab;
+  transition: all .18s;
+  user-select: none;
+  position: relative;
+}
+.card:active { cursor: grabbing; }
+.card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+.card.dragging { opacity: .35; }
+
+.card-job { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); margin-bottom: 6px; }
+.card-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-email { font-size: 11px; color: var(--text2); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.card-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.score-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  color: #fff;
+}
+.status-tag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+.tag-scheduled { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(163,113,247,.2); }
+.tag-hired     { background: var(--green-bg);  color: var(--green);  border: 1px solid rgba(63,185,80,.2); }
+.tag-rejected  { background: var(--red-bg);    color: var(--red);    border: 1px solid rgba(248,81,73,.2); }
+
+.card-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--border);
+}
+.act-btn {
+  flex: 1;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 5px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+  white-space: nowrap;
+}
+.act-btn:hover { background: var(--border); color: var(--text); }
+.act-btn.primary { background: var(--blue-bg); border-color: rgba(56,139,253,.25); color: var(--blue); }
+.act-btn.primary:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+.act-btn.green { color: var(--green); }
+.act-btn.green:hover { background: var(--green); color: #fff; border-color: var(--green); }
+.act-btn.red { color: var(--red); }
+.act-btn.red:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
+.empty-col {
+  border: 1.5px dashed var(--border);
+  border-radius: 8px;
+  padding: 28px 12px;
+  text-align: center;
+  color: var(--text3);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ─── No-job placeholder ────────────────────────────────────────────────── */
+.no-job {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--text3);
+}
+.no-job .big { font-size: 48px; }
+.no-job h2 { font-size: 18px; font-weight: 700; color: var(--text2); }
+.no-job p { font-size: 13px; }
+
+/* ─── Toast ─────────────────────────────────────────────────────────────── */
+.toasts {
+  position: fixed; bottom: 20px; right: 20px;
+  display: flex; flex-direction: column; gap: 6px; z-index: 9999;
+}
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 13px;
+  color: var(--text);
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  animation: toastIn .22s ease;
+  max-width: 300px;
+}
+.toast.ok   { border-left: 3px solid var(--green); }
+.toast.err  { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--blue); }
+@keyframes toastIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ─── Overlay / Modal ───────────────────────────────────────────────────── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.7);
+  animation: modalIn .2s ease;
+}
+.modal.wide { max-width: 640px; }
+@keyframes modalIn { from { opacity:0; transform:scale(.96) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+
+.modal-head {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky; top: 0;
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  z-index: 10;
+}
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.modal-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.modal-x {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all .15s;
+}
+.modal-x:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
+.modal-body { padding: 20px 22px; }
+.modal-foot {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 9px;
+  justify-content: flex-end;
+  position: sticky; bottom: 0;
+  background: var(--surface);
+  border-radius: 0 0 16px 16px;
+}
+
+/* ─── Form fields ───────────────────────────────────────────────────────── */
+.field { margin-bottom: 14px; }
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 5px;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); }
+.field textarea { resize: vertical; min-height: 80px; }
+.field select option { background: var(--surface2); }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.full  { grid-column: 1 / -1; }
+
+/* ─── Round item ────────────────────────────────────────────────────────── */
+.round-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--purple);
+  border-radius: 9px;
+  padding: 13px;
+  margin-bottom: 10px;
+}
+.round-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.round-label { font-size: 11px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: .5px; }
+.round-del {
+  background: none; border: none;
+  color: var(--text3); cursor: pointer;
+  font-size: 13px; padding: 2px 6px;
+  border-radius: 4px; transition: all .12s;
+}
+.round-del:hover { color: var(--red); background: var(--red-bg); }
+.add-round {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px dashed var(--border2);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 12px; font-weight: 600;
+  padding: 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.add-round:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ─── Buttons ───────────────────────────────────────────────────────────── */
+.btn {
+  font-family: var(--font);
+  font-size: 13px; font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .15s;
+  border: 1.5px solid transparent;
+  display: inline-flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-primary  { background: var(--blue);   color: #fff; border-color: var(--blue); }
+.btn-primary:hover:not(:disabled)  { filter: brightness(1.1); }
+.btn-success  { background: var(--green);  color: #fff; border-color: var(--green); }
+.btn-success:hover:not(:disabled)  { filter: brightness(1.1); }
+.btn-danger   { background: var(--red);    color: #fff; border-color: var(--red); }
+.btn-danger:hover:not(:disabled)   { filter: brightness(1.1); }
+.btn-orange   { background: #D18000;       color: #fff; border-color: #D18000; }
+.btn-orange:hover:not(:disabled)   { filter: brightness(1.1); }
+.btn-ghost    { background: var(--surface2); border-color: var(--border); color: var(--text2); }
+.btn-ghost:hover:not(:disabled)    { border-color: var(--border2); color: var(--text); }
+
+/* ─── Candidate banner ──────────────────────────────────────────────────── */
+.cand-banner {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 13px 15px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cand-avi {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.cand-info-name { font-size: 14px; font-weight: 700; }
+.cand-info-meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.cand-score { margin-left: auto; text-align: right; }
+.score-big { font-size: 20px; font-weight: 800; }
+
+/* ─── Section label ─────────────────────────────────────────────────────── */
+.sec-label {
+  font-size: 10px; font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  margin: 16px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+/* ─── Existing rounds display ───────────────────────────────────────────── */
+.exist-round {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--purple);
+  border-radius: 8px;
+  padding: 10px 13px;
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+.exist-round-top { display: flex; justify-content: space-between; margin-bottom: 3px; }
+.exist-round-name { font-weight: 700; color: var(--purple); font-size: 11px; text-transform: uppercase; letter-spacing: .3px; }
+.exist-round-mode { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: var(--purple-bg); color: var(--purple); }
+.exist-round-detail { color: var(--text2); font-size: 11px; }
+
+/* ─── Confirm modal ─────────────────────────────────────────────────────── */
+.confirm-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px; }
+.confirm-icon.green { background: var(--green-bg); }
+.confirm-icon.red   { background: var(--red-bg); }
+.confirm-text { text-align: center; margin-bottom: 16px; }
+.confirm-text h3 { font-size: 17px; font-weight: 700; margin-bottom: 5px; }
+.confirm-text p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+/* ─── Email preview ─────────────────────────────────────────────────────── */
+.email-preview {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text2);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 160px;
+  overflow-y: auto;
+  line-height: 1.6;
+  margin-top: 6px;
+}
+
+/* ─── Spinner ───────────────────────────────────────────────────────────── */
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  margin: 40px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Result inline ─────────────────────────────────────────────────────── */
+.inline-result { margin-top: 10px; font-size: 12px; }
+.inline-result.ok  { color: var(--green); }
+.inline-result.err { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>⚡ Synergycom</h1>
+      <p id="portal-label">HR Portal</p>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- injected by JS based on role -->
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="avatar-initial">H</div>
+        <div class="user-info">
+          <p id="user-name">HR User</p>
+          <span id="user-role-label">HR</span>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────────────────────────── -->
+  <div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title">🎯 Recruitment Board</span>
+        <select class="job-select" id="job-select" onchange="selectJob(this.value)">
+          <option value="">— Select a job —</option>
+        </select>
+      </div>
+      <div class="topbar-stats" id="board-stats"></div>
+    </div>
+
+    <!-- Board -->
+    <div class="board-wrap" id="board-wrap">
+      <div class="no-job">
+        <div class="big">🎯</div>
+        <h2>Select a job to start</h2>
+        <p>Choose a job from the dropdown above</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Toast container ─────────────────────────────────────────────────── -->
+<div class="toasts" id="toasts"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SCHEDULE MODAL
+══════════════════════════════════════════════════════════════════════ -->
+<div class="overlay" id="sched-overlay" onclick="overlayClick(event,'sched-overlay')">
+<div class="modal wide">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">📅 Schedule Interview</div>
+      <div class="modal-sub" id="sched-cand-sub">—</div>
+    </div>
+    <button class="modal-x" onclick="closeModal('sched-overlay')">✕</button>
+  </div>
+  <div class="modal-body" id="sched-body"></div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" onclick="closeModal('sched-overlay')">Cancel</button>
+    <button class="btn btn-primary" id="sched-save-btn" onclick="saveSchedule()">📅 Schedule & Send Email</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ROUND EMAIL MODAL
+══════════════════════════════════════════════════════════════════════ -->
+<div class="overlay" id="email-overlay" onclick="overlayClick(event,'email-overlay')">
+<div class="modal">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">📨 Send Round Email</div>
+      <div class="modal-sub" id="email-cand-sub">—</div>
+    </div>
+    <button class="modal-x" onclick="closeModal('email-overlay')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="field"><label>Round Name *</label><input type="text" id="email-round" placeholder="e.g. Technical Round 2, HR Final..."></div>
+    <div class="field"><label>Subject</label><input type="text" id="email-subj"></div>
+    <div class="field"><label>Body</label><textarea id="email-body-txt" rows="7"></textarea></div>
+    <div class="sec-label">Preview</div>
+    <div class="email-preview" id="email-preview">Fill fields above to preview</div>
+    <div class="inline-result" id="email-result"></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" onclick="closeModal('email-overlay')">Cancel</button>
+    <button class="btn btn-orange" id="email-send-btn" onclick="sendRoundEmail()">📨 Send Email</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     HIRED MODAL
+══════════════════════════════════════════════════════════════════════ -->
+<div class="overlay" id="hired-overlay" onclick="overlayClick(event,'hired-overlay')">
+<div class="modal">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">🎉 Mark as Selected</div>
+      <div class="modal-sub" id="hired-cand-sub">—</div>
+    </div>
+    <button class="modal-x" onclick="closeModal('hired-overlay')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="confirm-icon green">🎉</div>
+    <div class="confirm-text">
+      <h3>Confirm Selection</h3>
+      <p id="hired-confirm-p">Candidate will be marked as <strong>Selected / Hired</strong>.</p>
+    </div>
+    <div class="sec-label">Selection Email</div>
+    <div class="field"><label>Subject</label><input type="text" id="hired-subj"></div>
+    <div class="field"><label>Body</label><textarea id="hired-body-txt" rows="6"></textarea></div>
+    <div class="inline-result" id="hired-result"></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" onclick="closeModal('hired-overlay')">Cancel</button>
+    <button class="btn btn-success" id="hired-btn" onclick="confirmHired()">✅ Confirm & Notify</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     REJECT MODAL
+══════════════════════════════════════════════════════════════════════ -->
+<div class="overlay" id="reject-overlay" onclick="overlayClick(event,'reject-overlay')">
+<div class="modal">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">❌ Reject Candidate</div>
+      <div class="modal-sub" id="reject-cand-sub">—</div>
+    </div>
+    <button class="modal-x" onclick="closeModal('reject-overlay')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="confirm-icon red">❌</div>
+    <div class="confirm-text">
+      <h3>Confirm Rejection</h3>
+      <p id="reject-confirm-p">Candidate will be <strong>rejected</strong> and archived.</p>
+    </div>
+    <div class="sec-label">Rejection Email (optional)</div>
+    <div class="field"><label>Subject</label><input type="text" id="reject-subj"></div>
+    <div class="field"><label>Body</label><textarea id="reject-body-txt" rows="5"></textarea></div>
+    <div class="inline-result" id="reject-result"></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" onclick="closeModal('reject-overlay')">Cancel</button>
+    <button class="btn btn-danger" id="reject-btn" onclick="confirmRejected()">❌ Confirm Rejection</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════════════════ -->
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+const API   = 'http://127.0.0.1:8000/api';
+const token = localStorage.getItem('access_token');
+const role  = localStorage.getItem('role_code');   // ADMIN | HR | JR_HR
+
+if (!token) window.location.href = 'index.html';
+if (!['ADMIN','HR','JR_HR'].includes(role)) window.location.href = 'employee-dashboard.html';
+
+// ── Sidebar by role ───────────────────────────────────────────────────────────
+const uname = localStorage.getItem('employee_name') || 'HR User';
+document.getElementById('user-name').textContent       = uname;
+document.getElementById('user-role-label').textContent = localStorage.getItem('role_name') || role;
+document.getElementById('avatar-initial').textContent  = uname.charAt(0).toUpperCase();
+
+const isJrHR  = role === 'JR_HR';
+const isAdmin = role === 'ADMIN' || role === 'HR';
+
+document.getElementById('portal-label').textContent = isJrHR ? 'Junior HR Portal' : 'HR / Admin Portal';
+
+const navLinks = isJrHR
+  ? [
+      { href:'jrhr-dashboard.html',    icon:'🏠', label:'Dashboard' },
+      { href:'jrhr-kanban.html',       icon:'🎯', label:'Recruitment Board', active:true },
+      { href:'change-password.html',   icon:'🔑', label:'Change Password' },
+    ]
+  : [
+      { href:'admin-dashboard.html',        icon:'🏠', label:'Dashboard' },
+      { href:'employee-list.html',          icon:'👥', label:'Employees' },
+      { href:'admin-job-openings.html',     icon:'📢', label:'Job Openings' },
+      { href:'hr-screening-results.html',   icon:'🎯', label:'Screening Results' },
+      { href:'jrhr-kanban.html',            icon:'📋', label:'Recruitment Board', active:true },
+      { href:'admin-change-password.html',  icon:'🔑', label:'Change Password' },
+    ];
+
+document.getElementById('sidebar-nav').innerHTML = navLinks.map(l =>
+  `<a href="${l.href}" ${l.active?'class="active"':''}><span class="icon">${l.icon}</span> ${l.label}</a>`
+).join('');
+
+// ── Token expiry ───────────────────────────────────────────────────────────────
+function isExpired(t) {
+  try { return JSON.parse(atob(t.split('.')[1])).exp * 1000 < Date.now(); }
+  catch { return true; }
+}
+function checkToken() {
+  if (!localStorage.getItem('access_token') || isExpired(localStorage.getItem('access_token'))) {
+    localStorage.clear(); window.location.href = 'index.html';
+  }
+}
+checkToken();
+setInterval(checkToken, 30000);
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function hdrs() {
+  return { 'Content-Type':'application/json', 'Authorization':`Bearer ${localStorage.getItem('access_token')}` };
+}
+async function apiFetch(url, opts={}) {
+  const res = await fetch(url, { ...opts, headers: hdrs() });
+  if (res.status === 401) { localStorage.clear(); window.location.href = 'index.html'; return null; }
+  return res;
+}
+function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = (type==='ok'?'✅':type==='err'?'❌':'ℹ️') + ' ' + msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function overlayClick(e,id) { if (e.target===document.getElementById(id)) closeModal(id); }
+
+function scoreColor(s) { return s>=80?'#3FB950':s>=60?'#D29922':s>=40?'#F07800':'#F85149'; }
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentJobId    = null;
+let currentJobTitle = '';
+let candidates      = [];
+let employees       = [];
+let activeSid       = null;
+let dragSrcId       = null;
+let roundIdx        = 0;
+
+// ── Load jobs into select ─────────────────────────────────────────────────────
+async function loadJobs() {
+  try {
+    const res = await apiFetch(`${API}/recruitment/shortlist/jobs/`);
+    if (!res || !res.ok) return;
+    const jobs = await res.json();
+    const sel  = document.getElementById('job-select');
+    sel.innerHTML = '<option value="">— Select a job —</option>';
+    jobs.forEach(j => {
+      const o = document.createElement('option');
+      o.value = j.job_id;
+      o.textContent = `${j.job_title}${j.department?' · '+j.department:''} (${j.shortlist_count})`;
+      sel.appendChild(o);
+    });
+  } catch(e) { toast('Failed to load jobs','err'); }
+}
+
+async function loadEmployees() {
+  try {
+    const res = await apiFetch(`${API}/accounts/employees/`);
+    if (!res) return;
+    const data = await res.json();
+    employees = (Array.isArray(data)?data:(data.results||[])).filter(e=>e.is_active_employee!==false);
+  } catch { employees = []; }
+}
+
+// ── Select job → render board ─────────────────────────────────────────────────
+async function selectJob(jobId) {
+  if (!jobId) {
+    currentJobId = null;
+    document.getElementById('board-wrap').innerHTML = `
+      <div class="no-job">
+        <div class="big">🎯</div>
+        <h2>Select a job to start</h2>
+        <p>Choose a job from the dropdown above</p>
+      </div>`;
+    document.getElementById('board-stats').innerHTML = '';
+    return;
+  }
+  currentJobId = jobId;
+  const opt = document.querySelector(`#job-select option[value="${jobId}"]`);
+  currentJobTitle = opt ? opt.textContent.split('·')[0].trim().replace(/\s*\(\d+\)\s*$/,'') : '';
+  document.getElementById('board-wrap').innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center"><div class="spinner"></div></div>';
+  await fetchCandidates();
+}
+
+async function fetchCandidates() {
+  try {
+    // ✅ FIXED: correct URL → /shortlist/job/<id>/
+    const res = await apiFetch(`${API}/recruitment/shortlist/job/${currentJobId}/`);
+    if (!res||!res.ok) throw new Error();
+    const data = await res.json();
+    candidates = data.shortlisted || [];
+    renderBoard();
+  } catch {
+    document.getElementById('board-wrap').innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--red)">Failed to load. Please retry.</div>';
+  }
+}
+
+// ── Board render ──────────────────────────────────────────────────────────────
+const COLS = [
+  { key:'SHORTLISTED', label:'Shortlisted', emoji:'📋' },
+  { key:'SCHEDULED',   label:'Scheduled',   emoji:'📅' },
+  { key:'HIRED',       label:'Selected',    emoji:'✅' },
+  { key:'REJECTED',    label:'Rejected',    emoji:'❌' },
+];
+
+function renderBoard() {
+  const byStatus = {};
+  COLS.forEach(c => { byStatus[c.key] = candidates.filter(s=>s.status===c.key); });
+
+  document.getElementById('board-stats').innerHTML = COLS.map(c=>
+    `<div class="stat-chip"><b>${byStatus[c.key].length}</b> ${c.label}</div>`
+  ).join('');
+
+  const colsHtml = COLS.map(c => {
+    const items = byStatus[c.key];
+    const cards = items.length
+      ? items.map(s=>renderCard(s)).join('')
+      : `<div class="empty-col">${c.emoji}<br>No candidates</div>`;
+    return `
+      <div class="col" data-col="${c.key}"
+           ondragover="onDragOver(event,'${c.key}')"
+           ondrop="onDrop(event,'${c.key}')"
+           ondragleave="e=>e.currentTarget.classList.remove('drag-over')">
+        <div class="col-head">
+          <div class="col-stripe"></div>
+          <div class="col-label">${c.label}</div>
+          <div class="col-count">${items.length}</div>
+        </div>
+        <div class="col-body">${cards}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('board-wrap').innerHTML = `<div class="board">${colsHtml}</div>`;
+
+  document.querySelectorAll('.card[draggable]').forEach(card=>{
+    card.addEventListener('dragstart', e=>{
+      dragSrcId = parseInt(card.dataset.id);
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    card.addEventListener('dragend', ()=>card.classList.remove('dragging'));
+  });
+}
+
+function renderCard(s) {
+  const col  = s.status;
+  const isDone = col==='HIRED'||col==='REJECTED';
+  const drag   = isDone ? '' : 'draggable="true"';
+
+  let statusTag = '';
+  if (col==='SCHEDULED') statusTag = `<span class="status-tag tag-scheduled">📅 ${s.interview_count||0} round${(s.interview_count||0)!==1?'s':''}</span>`;
+  if (col==='HIRED')     statusTag = `<span class="status-tag tag-hired">✅ Selected</span>`;
+  if (col==='REJECTED')  statusTag = `<span class="status-tag tag-rejected">❌ Rejected</span>`;
+
+  const emailHtml = s.candidate_email
+    ? `<div class="card-email">✉ ${s.candidate_email}</div>`
+    : `<div class="card-email" style="color:var(--red)">⚠ No email</div>`;
+
+  let actions = '';
+  if (col==='SHORTLISTED') {
+    actions = `<div class="card-actions">
+      <button class="act-btn primary" onclick="openSchedModal(${s.id})">📅 Schedule</button>
+      <button class="act-btn red" onclick="openRejectModal(${s.id})">✕ Reject</button>
+    </div>`;
+  } else if (col==='SCHEDULED') {
+    actions = `<div class="card-actions">
+      <button class="act-btn primary" onclick="openSchedModal(${s.id})">➕ Add Round</button>
+      <button class="act-btn" onclick="openEmailModal(${s.id})">📨 Email</button>
+      <button class="act-btn green" onclick="openHiredModal(${s.id})">✅ Select</button>
+      <button class="act-btn red" style="font-size:9px" onclick="openRejectModal(${s.id})">✕</button>
+    </div>`;
+  }
+
+  return `
+    <div class="card" data-id="${s.id}" data-status="${col}" ${drag}>
+      <div class="card-job">${s.job_title||currentJobTitle}</div>
+      <div class="card-name">👤 ${s.candidate_name}</div>
+      ${emailHtml}
+      <div class="card-footer">
+        <span class="score-pill" style="background:${scoreColor(s.match_score)}">${s.match_score}%</span>
+        ${statusTag}
+      </div>
+      ${actions}
+    </div>`;
+}
+
+// ── Drag & drop ───────────────────────────────────────────────────────────────
+function onDragOver(e, colKey) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+  e.dataTransfer.dropEffect='move';
+}
+function onDrop(e, targetStatus) {
+  e.preventDefault();
+  document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'));
+  if (!dragSrcId) return;
+  const s = candidates.find(c=>c.id===dragSrcId);
+  if (!s||s.status===targetStatus) return;
+  if (targetStatus==='SHORTLISTED') return;
+  if (s.status==='HIRED'||s.status==='REJECTED') return;
+  if (targetStatus==='SCHEDULED') { openSchedModal(dragSrcId); return; }
+  if (targetStatus==='HIRED')     { openHiredModal(dragSrcId); return; }
+  if (targetStatus==='REJECTED')  { openRejectModal(dragSrcId); return; }
+}
+
+// ── Employee options helper ───────────────────────────────────────────────────
+function empOptions() {
+  return '<option value="">— Select Interviewer —</option>'
+    + employees.map(e=>`<option value="${e.id}">${e.first_name||''} ${e.last_name||''} — ${e.designation||'Employee'}</option>`).join('');
+}
+
+function getCandidate(id) { return candidates.find(c=>c.id===id); }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SCHEDULE MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+let schedRounds = [];
+
+async function openSchedModal(shortlistId) {
+  activeSid   = shortlistId;
+  schedRounds = [];
+  roundIdx    = 0;
+  const s = getCandidate(shortlistId);
+  if (!s) return;
+
+  document.getElementById('sched-cand-sub').textContent = `${s.candidate_name} · ${s.job_title||currentJobTitle}`;
+  document.getElementById('sched-save-btn').disabled = false;
+  document.getElementById('sched-save-btn').textContent = '📅 Schedule & Send Email';
+
+  // Fetch existing interviews
+  // ✅ FIXED: /recruitment/interviews/job/<id>/ (plural "interviews")
+  let existHtml = '';
+  if (s.has_interview && s.interview_count > 0) {
+    try {
+      const res = await apiFetch(`${API}/recruitment/interviews/job/${currentJobId}/`);
+      if (res&&res.ok) {
+        const data = await res.json();
+        const mine = (data.interviews||[]).filter(iv=>iv.shortlist===shortlistId);
+        if (mine.length) {
+          existHtml = `<div class="sec-label">Existing Rounds</div>`
+            + mine.map(iv=>`
+              <div class="exist-round">
+                <div class="exist-round-top">
+                  <span class="exist-round-name">📅 ${iv.interview_date} @ ${iv.interview_time?.slice(0,5)||''}</span>
+                  <span class="exist-round-mode">${iv.mode}</span>
+                </div>
+                <div class="exist-round-detail">
+                  Interviewer: ${iv.interviewer_name||'—'} ·
+                  ${iv.mode==='ONLINE'?(iv.meeting_link||'No link'):(iv.venue||'No venue')} ·
+                  Email: ${iv.email_sent?'✅ sent':'⚠ not sent'}
+                </div>
+              </div>`).join('');
+        }
+      }
+    } catch {}
+  }
+
+  document.getElementById('sched-body').innerHTML = `
+    ${candidateBanner(s)}
+    ${existHtml}
+    <div class="sec-label">Add New Round</div>
+    <div id="rounds-wrap"></div>
+    <button class="add-round" onclick="addRound()">＋ Add Interview Round</button>
+    <div class="inline-result" id="sched-result"></div>`;
+
+  addRound();
+  openModal('sched-overlay');
+}
+
+function addRound() {
+  const idx = roundIdx++;
+  schedRounds.push({ date:'',time:'',mode:'ONLINE',link:'',venue:'',iv:'',notes:'' });
+  const wrap = document.getElementById('rounds-wrap');
+  const div  = document.createElement('div');
+  div.className = 'round-item';
+  div.id = `r-${idx}`;
+  div.innerHTML = `
+    <div class="round-head">
+      <span class="round-label">Round ${document.querySelectorAll('.round-item').length+1}</span>
+      <button class="round-del" onclick="delRound('r-${idx}',${idx})">🗑</button>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Date *</label>
+        <input type="date" id="rd-${idx}" min="${new Date().toISOString().split('T')[0]}">
+      </div>
+      <div class="field"><label>Time *</label>
+        <input type="time" id="rt-${idx}">
+      </div>
+      <div class="field"><label>Mode *</label>
+        <select id="rm-${idx}" onchange="toggleMode(${idx})">
+          <option value="ONLINE">🌐 Online</option>
+          <option value="OFFLINE">🏢 Offline</option>
+        </select>
+      </div>
+      <div class="field"><label>Interviewer *</label>
+        <select id="ri-${idx}">${empOptions()}</select>
+      </div>
+      <div class="field full" id="rl-${idx}"><label>Meeting Link</label>
+        <input type="url" id="rlv-${idx}" placeholder="https://meet.google.com/...">
+      </div>
+      <div class="field full" id="rv-${idx}" style="display:none"><label>Venue</label>
+        <input type="text" id="rvv-${idx}" placeholder="Conference Room...">
+      </div>
+      <div class="field full"><label>Notes</label>
+        <input type="text" id="rn-${idx}" placeholder="e.g. Technical round, bring portfolio...">
+      </div>
+    </div>`;
+  wrap.appendChild(div);
+  document.querySelectorAll('.round-label').forEach((el,i)=>el.textContent=`Round ${i+1}`);
+}
+
+function delRound(domId, idx) {
+  document.getElementById(domId)?.remove();
+  document.querySelectorAll('.round-label').forEach((el,i)=>el.textContent=`Round ${i+1}`);
+}
+
+function toggleMode(idx) {
+  const m = document.getElementById(`rm-${idx}`)?.value;
+  document.getElementById(`rl-${idx}`).style.display = m==='ONLINE'?'block':'none';
+  document.getElementById(`rv-${idx}`).style.display = m==='OFFLINE'?'block':'none';
+}
+
+async function saveSchedule() {
+  const items = document.querySelectorAll('.round-item');
+  const rounds = [];
+  let valid = true;
+  items.forEach(item => {
+    const idx  = parseInt(item.id.replace('r-',''));
+    const date = document.getElementById(`rd-${idx}`)?.value;
+    const time = document.getElementById(`rt-${idx}`)?.value;
+    const mode = document.getElementById(`rm-${idx}`)?.value||'ONLINE';
+    const iv   = document.getElementById(`ri-${idx}`)?.value;
+    if (!date||!time||!iv) { valid=false; return; }
+    rounds.push({
+      date, time, mode, iv,
+      link:  document.getElementById(`rlv-${idx}`)?.value||'',
+      venue: document.getElementById(`rvv-${idx}`)?.value||'',
+      notes: document.getElementById(`rn-${idx}`)?.value||'',
+    });
+  });
+  if (!rounds.length) { toast('Add at least one round','err'); return; }
+  if (!valid) { toast('Fill date, time, and interviewer for all rounds','err'); return; }
+
+  const btn = document.getElementById('sched-save-btn');
+  btn.disabled=true; btn.textContent='⏳ Scheduling...';
+
+  const s = getCandidate(activeSid);
+  let ok = 0;
+
+  for (const r of rounds) {
+    try {
+      // ✅ FIXED: /recruitment/interview/<shortlist_id>/ (not interview/schedule/)
+      const res = await apiFetch(`${API}/recruitment/interview/${activeSid}/`, {
+        method:'POST',
+        body: JSON.stringify({
+          interview_date:       r.date,
+          interview_time:       r.time,
+          mode:                 r.mode,
+          meeting_link:         r.mode==='ONLINE'  ? r.link  : '',
+          venue:                r.mode==='OFFLINE' ? r.venue : '',
+          assigned_interviewer: parseInt(r.iv),
+          notes:                r.notes,
+        }),
+      });
+
+      if (res && res.ok) {
+        ok++;
+        // ✅ FIXED: /recruitment/shortlist/status/<pk>/ (not shortlist/<id>/status/)
+        await apiFetch(`${API}/recruitment/shortlist/status/${activeSid}/`, {
+          method:'PATCH',
+          body: JSON.stringify({ status: 'SCHEDULED' }),
+        });
+        if (s) s.status = 'SCHEDULED';
+      }
+    } catch(e) {
+      console.error('[saveSchedule] round error:', e);
+    }
+  }
+
+  if (ok > 0) {
+    toast(`${ok} round(s) scheduled! Candidate email sent.`, 'ok');
+    const resultEl = document.getElementById('sched-result');
+    if (resultEl) {
+      resultEl.className = 'inline-result ok';
+      resultEl.innerHTML = `✅ ${ok} round(s) scheduled · 📧 Candidate email sent · 👤 Interviewer assigned`;
+    }
+    setTimeout(async () => {
+      closeModal('sched-overlay');
+      await fetchCandidates();
+    }, 1400);
+  } else {
+    const resultEl = document.getElementById('sched-result');
+    resultEl.innerHTML = '❌ Failed to schedule. Check required fields.';
+    resultEl.className = 'inline-result err';
+    btn.disabled=false;
+    btn.textContent='📅 Schedule & Send Email';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ROUND EMAIL MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+const DEF_ROUND_SUBJ = '{round} Invitation — {job_title} at {company}';
+const DEF_ROUND_BODY =
+`Dear {candidate_name},
+
+We would like to invite you for the next stage of your interview for {job_title} at {company}.
+
+INTERVIEW DETAILS:
+━━━━━━━━━━━━━━━━━━━━━━━━
+Round       : {round}
+Date        : {date}
+Time        : {time}
+Mode        : {mode}
+Location    : {link_or_venue}
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Please confirm your availability by replying to this email.
+
+Best regards,
+SynergyCom HR Team`;
+
+function openEmailModal(shortlistId) {
+  activeSid = shortlistId;
+  const s   = getCandidate(shortlistId);
+  document.getElementById('email-cand-sub').textContent = s?s.candidate_name:'—';
+  document.getElementById('email-round').value          = '';
+  document.getElementById('email-subj').value           = DEF_ROUND_SUBJ;
+  document.getElementById('email-body-txt').value       = DEF_ROUND_BODY;
+  document.getElementById('email-result').innerHTML     = '';
+  document.getElementById('email-send-btn').disabled    = false;
+  document.getElementById('email-send-btn').textContent = '📨 Send Email';
+  updateEmailPreview();
+  document.getElementById('email-round').oninput    = updateEmailPreview;
+  document.getElementById('email-body-txt').oninput = updateEmailPreview;
+  openModal('email-overlay');
+}
+
+function updateEmailPreview() {
+  const s     = getCandidate(activeSid);
+  const round = document.getElementById('email-round')?.value || 'Round X';
+  let preview = document.getElementById('email-body-txt')?.value||'';
+  preview = preview
+    .replace(/{candidate_name}/g, s?.candidate_name||'—')
+    .replace(/{job_title}/g, s?.job_title||currentJobTitle)
+    .replace(/{company}/g, 'SynergyCom')
+    .replace(/{round}/g, round)
+    .replace(/{date}/g,'<date>').replace(/{time}/g,'<time>')
+    .replace(/{mode}/g,'<mode>').replace(/{link_or_venue}/g,'<location>');
+  document.getElementById('email-preview').textContent = preview;
+}
+
+async function sendRoundEmail() {
+  const round = document.getElementById('email-round').value.trim();
+  const subj  = document.getElementById('email-subj').value;
+  const body  = document.getElementById('email-body-txt').value;
+  if (!round) { toast('Enter a round name','err'); return; }
+
+  const btn = document.getElementById('email-send-btn');
+  btn.disabled=true; btn.textContent='⏳ Sending...';
+  document.getElementById('email-result').innerHTML='';
+
+  try {
+    // ✅ FIXED: /recruitment/interview/resend/ (not interview/resend-email/)
+    const res = await apiFetch(`${API}/recruitment/interview/resend/`, {
+      method:'POST',
+      body: JSON.stringify({
+        shortlist_id:  activeSid,
+        round_name:    round,
+        email_subject: subj,
+        email_body:    body,
+      }),
+    });
+    if (!res) return;
+    const data = await res.json();
+    if (res.ok && data.sent) {
+      toast(`"${data.round}" email sent to ${data.candidate}!`, 'ok');
+      closeModal('email-overlay');
+    } else {
+      const el = document.getElementById('email-result');
+      el.textContent = '❌ '+(data.message||'Failed to send');
+      el.className   = 'inline-result err';
+      btn.disabled=false; btn.textContent='📨 Send Email';
+    }
+  } catch {
+    btn.disabled=false; btn.textContent='📨 Send Email';
+    toast('Something went wrong','err');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HIRED MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+function openHiredModal(shortlistId) {
+  activeSid = shortlistId;
+  const s   = getCandidate(shortlistId);
+  if (!s) return;
+  document.getElementById('hired-cand-sub').textContent = s.candidate_name;
+  document.getElementById('hired-confirm-p').innerHTML =
+    `<strong>${s.candidate_name}</strong> will be marked as <strong>Selected</strong> for <strong>${s.job_title||currentJobTitle}</strong>.`;
+  document.getElementById('hired-subj').value =
+    `Congratulations! — You have been Selected for ${s.job_title||currentJobTitle}`;
+  document.getElementById('hired-body-txt').value =
+    `Dear ${s.candidate_name},\n\nWe are delighted to inform you that you have been selected for the position of ${s.job_title||currentJobTitle} at SynergyCom.\n\nOur HR team will contact you shortly with onboarding details.\n\nCongratulations!\n\nBest regards,\nSynergyCom HR Team`;
+  document.getElementById('hired-result').innerHTML='';
+  document.getElementById('hired-btn').disabled=false;
+  document.getElementById('hired-btn').textContent='✅ Confirm & Notify';
+  openModal('hired-overlay');
+}
+
+async function confirmHired() {
+  const s    = getCandidate(activeSid);
+  const btn  = document.getElementById('hired-btn');
+  const subj = document.getElementById('hired-subj').value.trim();
+  const body = document.getElementById('hired-body-txt').value.trim();
+  btn.disabled=true; btn.textContent='⏳ Processing...';
+
+  const resultEl = document.getElementById('hired-result');
+
+  try {
+    // 1️⃣ Update status to HIRED
+    const res = await apiFetch(`${API}/recruitment/shortlist/status/${activeSid}/`, {
+      method:'PATCH',
+      body: JSON.stringify({ status: 'HIRED' }),
+    });
+    if (!res || !res.ok) {
+      resultEl.textContent='❌ Failed to update status'; resultEl.className='inline-result err';
+      btn.disabled=false; btn.textContent='✅ Confirm & Notify';
+      return;
+    }
+    if (s) s.status = 'HIRED';
+
+    // 2️⃣ Send selection email via resend endpoint
+    let emailSent = false;
+    let emailErr  = '';
+    if (s?.candidate_email && subj && body) {
+      try {
+        const eRes  = await apiFetch(`${API}/recruitment/interview/resend/`, {
+          method:'POST',
+          body: JSON.stringify({
+            shortlist_id:  activeSid,
+            round_name:    'Selection Notification',
+            email_subject: subj,
+            email_body:    body,
+          }),
+        });
+        const eData = eRes ? await eRes.json() : null;
+        if (eRes && eRes.ok && eData?.sent) {
+          emailSent = true;
+        } else {
+          emailErr = eData?.message || `HTTP ${eRes?.status}`;
+        }
+      } catch(e) { emailErr = e.message || 'Network error'; }
+    } else if (!s?.candidate_email) {
+      emailErr = 'No candidate email on record';
+    }
+
+    const emailNote = emailSent
+      ? ' · 📧 Selection email sent!'
+      : (emailErr ? ` · ⚠ Email failed: ${emailErr}` : '');
+
+    toast(`${s?.candidate_name||'Candidate'} marked as Selected! 🎉`, 'ok');
+
+    // 3️⃣ If ADMIN or HR → save prefill and redirect to Add Employee
+    if (isAdmin) {
+      localStorage.setItem('prefill_candidate', JSON.stringify({
+        first_name:  (s?.candidate_name||'').split(' ')[0] || '',
+        last_name:   (s?.candidate_name||'').split(' ').slice(1).join(' ') || '',
+        email:       s?.candidate_email || '',
+        designation: s?.job_title || currentJobTitle || '',
+        from_kanban: true,
+      }));
+      resultEl.className = 'inline-result ok';
+      resultEl.innerHTML = `✅ Marked as Selected${emailNote}<br>Redirecting to Add Employee…`;
+      setTimeout(() => { window.location.href = 'add-employee.html'; }, 1800);
+    } else {
+      // JR_HR — just refresh board
+      resultEl.className = 'inline-result ok';
+      resultEl.innerHTML = `✅ Marked as Selected${emailNote}<br>HR/Admin will create the employee account.`;
+      setTimeout(async () => {
+        closeModal('hired-overlay');
+        await fetchCandidates();
+      }, 2000);
+    }
+  } catch {
+    btn.disabled=false; btn.textContent='✅ Confirm & Notify';
+    toast('Something went wrong','err');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REJECT MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+function openRejectModal(shortlistId) {
+  activeSid = shortlistId;
+  const s   = getCandidate(shortlistId);
+  if (!s) return;
+  document.getElementById('reject-cand-sub').textContent = s.candidate_name;
+  document.getElementById('reject-confirm-p').innerHTML  =
+    `<strong>${s.candidate_name}</strong> will be rejected for <strong>${s.job_title||currentJobTitle}</strong>.`;
+  document.getElementById('reject-subj').value =
+    `Update on Your Application — ${s.job_title||currentJobTitle}`;
+  document.getElementById('reject-body-txt').value =
+    `Dear ${s.candidate_name},\n\nThank you for your interest in the ${s.job_title||currentJobTitle} position at SynergyCom.\n\nAfter careful consideration, we regret to inform you that we will not be moving forward with your application at this time.\n\nWe appreciate your effort and wish you all the best.\n\nBest regards,\nSynergyCom HR Team`;
+  document.getElementById('reject-result').innerHTML='';
+  document.getElementById('reject-btn').disabled=false;
+  document.getElementById('reject-btn').textContent='❌ Confirm Rejection';
+  openModal('reject-overlay');
+}
+
+async function confirmRejected() {
+  const s    = getCandidate(activeSid);
+  const btn  = document.getElementById('reject-btn');
+  const subj = document.getElementById('reject-subj').value.trim();
+  const body = document.getElementById('reject-body-txt').value.trim();
+  btn.disabled=true; btn.textContent='⏳ Processing...';
+
+  const resultEl = document.getElementById('reject-result');
+
+  try {
+    // 1️⃣ Update status to REJECTED
+    const res = await apiFetch(`${API}/recruitment/shortlist/status/${activeSid}/`, {
+      method:'PATCH',
+      body: JSON.stringify({ status: 'REJECTED' }),
+    });
+    if (!res || !res.ok) {
+      resultEl.textContent='❌ Failed'; resultEl.className='inline-result err';
+      btn.disabled=false; btn.textContent='❌ Confirm Rejection';
+      return;
+    }
+    if (s) s.status = 'REJECTED';
+
+    // 2️⃣ Send rejection email via resend endpoint (if candidate has email)
+    let emailSent = false;
+    let emailErr  = '';
+    if (s?.candidate_email && subj && body) {
+      try {
+        const eRes  = await apiFetch(`${API}/recruitment/interview/resend/`, {
+          method:'POST',
+          body: JSON.stringify({
+            shortlist_id:  activeSid,
+            round_name:    'Application Update',
+            email_subject: subj,
+            email_body:    body,
+          }),
+        });
+        const eData = eRes ? await eRes.json() : null;
+        if (eRes && eRes.ok && eData?.sent) {
+          emailSent = true;
+        } else {
+          emailErr = eData?.message || `HTTP ${eRes?.status}`;
+        }
+      } catch(e) { emailErr = e.message || 'Network error'; }
+    } else if (!s?.candidate_email) {
+      emailErr = 'No candidate email on record';
+    }
+
+    if (emailSent) {
+      toast(`${s?.candidate_name||'Candidate'} rejected · 📧 Rejection email sent`, 'info');
+    } else {
+      toast(`${s?.candidate_name||'Candidate'} rejected (status updated)`, 'info');
+      if (emailErr) toast(`⚠ Email not sent: ${emailErr}`, 'err');
+    }
+    closeModal('reject-overlay');
+    await fetchCandidates();
+  } catch {
+    btn.disabled=false; btn.textContent='❌ Confirm Rejection';
+    toast('Something went wrong','err');
+  }
+}
+
+// ── Candidate banner ──────────────────────────────────────────────────────────
+function candidateBanner(s) {
+  const c = scoreColor(s.match_score);
+  return `
+    <div class="cand-banner">
+      <div class="cand-avi">${s.candidate_name.charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div class="cand-info-name">${s.candidate_name}</div>
+        <div class="cand-info-meta">✉ ${s.candidate_email||'No email'} · 📁 ${s.source_filename||'—'}</div>
+      </div>
+      <div class="cand-score">
+        <div class="score-big" style="color:${c}">${s.match_score}%</div>
+        <div style="font-size:10px;color:var(--text3)">match score</div>
+      </div>
+    </div>`;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  await Promise.all([loadJobs(), loadEmployees()]);
+}
+init();
+</script>
+</body>
+</html>

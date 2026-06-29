@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Raise Vacancy Request</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Employee Portal</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="employee-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="raise-vacancy.html" class="active"><span class="icon">📝</span> Raise Vacancy</a>
+            <a href="my-requests.html"><span class="icon">📋</span> My Requests</a>
+            <a href="job-openings.html"><span class="icon">📢</span> Job Openings</a>
+            <a href="change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">E</div>
+                <div class="user-info">
+                    <p id="user-name">Employee</p>
+                    <span id="user-role">Employee</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <p class="page-title">📝 Raise Vacancy Request</p>
+
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error" id="error-alert"></div>
+
+        <div class="form-card">
+
+            <div class="info-banner">
+                📌 Use this form when someone in your department has resigned or a new position is needed. Admin/HR will review your request.
+            </div>
+
+            <div class="form-section-title">🧾 Position Details</div>
+            <div class="form-grid-2" style="margin-bottom:28px">
+                <div class="form-group">
+                    <label>Job Title <span class="required-star">*</span></label>
+                    <input type="text" id="title" placeholder="e.g. Python Developer" />
+                </div>
+                <div class="form-group">
+                    <label>Experience Required <span class="required-star">*</span></label>
+                    <input type="text" id="experience" placeholder="e.g. 3 years, 2–4 years" />
+                </div>
+                <div class="form-group">
+                    <label>Department <span class="required-star">*</span></label>
+                    <select id="department">
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <select id="location">
+                        <option value="">Any / Remote</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section-title">👥 Number of Vacancies</div>
+            <div style="margin-bottom:28px">
+                <div class="vacancies-stepper">
+                    <button class="stepper-btn" onclick="changeVacancy(-1)">−</button>
+                    <input class="stepper-input" type="number" id="vacancies" value="1" min="1" />
+                    <button class="stepper-btn" onclick="changeVacancy(1)">+</button>
+                </div>
+            </div>
+
+            <div class="form-section-title">🛠️ Skills Required</div>
+            <div style="margin-bottom:28px">
+                <div class="skills-checkboxes" id="skills-container">
+                    <span class="loading-skills">Loading skills...</span>
+                </div>
+                <small style="color:#9CA3AF;font-size:12px;margin-top:8px;display:block">Click to select/deselect skills</small>
+            </div>
+
+            <div class="form-section-title">📋 Reason for Vacancy</div>
+            <div class="form-group" style="margin-bottom:28px">
+                <label>Description <span class="required-star">*</span></label>
+                <textarea id="description" placeholder="e.g. Our senior developer resigned last week. We need 2 replacements to continue the project before the Q3 deadline."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="submitRequest()" id="submit-btn">
+                    📝 Submit Request
+                </button>
+                <a href="my-requests.html" class="btn btn-secondary">View My Requests</a>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    if (!token) window.location.href = 'index.html';
+
+    const name = localStorage.getItem('employee_name') || 'Employee';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = localStorage.getItem('role_name') || 'Employee';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('success-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('error-alert').classList.remove('show');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('success-alert').classList.remove('show');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function changeVacancy(delta) {
+        const el = document.getElementById('vacancies');
+        el.value = Math.max(1, parseInt(el.value || 1) + delta);
+    }
+
+    function toggleSkill(label, id) {
+        label.classList.toggle('checked');
+    }
+
+    function getSelectedSkills() {
+        return Array.from(document.querySelectorAll('.skill-checkbox-label.checked'))
+            .map(el => parseInt(el.dataset.id));
+    }
+
+    async function loadDropdowns() {
+        try {
+            const [deptsRes, locsRes, skillsRes] = await Promise.all([
+                fetch(`${API}/masters/departments/`, { headers: authHeaders() }),
+                fetch(`${API}/masters/locations/`, { headers: authHeaders() }),
+                fetch(`${API}/masters/skills/`, { headers: authHeaders() }),
+            ]);
+
+            const depts = await deptsRes.json();
+            depts.forEach(d => {
+                document.getElementById('department').innerHTML += `<option value="${d.id}">${d.name}</option>`;
+            });
+
+            const locs = await locsRes.json();
+            locs.forEach(l => {
+                document.getElementById('location').innerHTML += `<option value="${l.id}">${l.name}</option>`;
+            });
+
+            const skills = await skillsRes.json();
+            const container = document.getElementById('skills-container');
+            if (skills.length === 0) {
+                container.innerHTML = '<span class="loading-skills">No skills available</span>';
+            } else {
+                container.innerHTML = skills.map(s => `
+                    <label class="skill-checkbox-label" data-id="${s.id}" onclick="toggleSkill(this, ${s.id})">
+                        <input type="checkbox" value="${s.id}" />
+                        ${s.name}
+                    </label>
+                `).join('');
+            }
+        } catch (e) {
+            showError('Failed to load form data');
+        }
+    }
+
+    async function submitRequest() {
+        const btn = document.getElementById('submit-btn');
+
+        const body = {
+            title: document.getElementById('title').value.trim(),
+            department: parseInt(document.getElementById('department').value) || null,
+            location: parseInt(document.getElementById('location').value) || null,
+            skills: getSelectedSkills(),
+            vacancies: parseInt(document.getElementById('vacancies').value) || 1,
+            experience: document.getElementById('experience').value.trim(),
+            description: document.getElementById('description').value.trim(),
+        };
+
+        if (!body.title || !body.department || !body.experience || !body.description) {
+            showError('Please fill all required fields (marked with *)');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+
+        try {
+            const res = await fetch(`${API}/jobs/vacancy-requests/`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                showSuccess('✅ Vacancy request submitted! Admin will review it shortly.');
+                document.getElementById('title').value = '';
+                document.getElementById('experience').value = '';
+                document.getElementById('description').value = '';
+                document.getElementById('vacancies').value = '1';
+                document.getElementById('department').value = '';
+                document.getElementById('location').value = '';
+                document.querySelectorAll('.skill-checkbox-label.checked').forEach(el => el.classList.remove('checked'));
+            } else {
+                const errors = Object.values(data).flat().join(', ');
+                showError(errors || 'Failed to submit request');
+            }
+        } catch (e) {
+            showError('Something went wrong. Please try again.');
+        }
+
+        btn.disabled = false;
+        btn.textContent = '📝 Submit Request';
+    }
+
+    loadDropdowns();
+</script>
+</body>
+</html>

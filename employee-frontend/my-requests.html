@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — My Requests</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ SynergyCom</h1>
+            <p>Employee Portal</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="employee-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="raise-vacancy.html"><span class="icon">📝</span> Raise Vacancy</a>
+            <a href="my-requests.html" class="active"><span class="icon">📋</span> My Requests</a>
+            <a href="job-openings.html"><span class="icon">📢</span> Job Openings</a>
+            <a href="change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">E</div>
+                <div class="user-info">
+                    <p id="user-name">Employee</p>
+                    <span id="user-role">Employee</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+            <p class="page-title" style="margin-bottom:0">My Vacancy Requests</p>
+            <a href="raise-vacancy.html" class="btn btn-primary">➕ New Request</a>
+        </div>
+
+        <div id="requests-container">
+            <div class="loading">Loading your requests...</div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    if (!token) window.location.href = 'index.html';
+
+    const name = localStorage.getItem('employee_name') || 'Employee';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = localStorage.getItem('role_name') || 'Employee';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function statusBadge(status) {
+        const map = {
+            'PENDING':  { cls: 'badge-warning',  icon: '⏳', label: 'Pending' },
+            'ACCEPTED': { cls: 'badge-success',  icon: '✅', label: 'Accepted' },
+            'REJECTED': { cls: 'badge-danger',   icon: '❌', label: 'Rejected' },
+        };
+        const s = map[status] || { cls: '', icon: '', label: status };
+        return `<span class="badge ${s.cls}" style="${s.cls === 'badge-warning' ? 'background:#FEF3C7;color:#92400E' : ''}">${s.icon} ${s.label}</span>`;
+    }
+
+    async function loadRequests() {
+        try {
+            const res = await fetch(`${API}/jobs/vacancy-requests/`, { headers: authHeaders() });
+            if (res.status === 401) { logout(); return; }
+            const data = await res.json();
+            const container = document.getElementById('requests-container');
+
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align:center;padding:48px">
+                        <div style="font-size:48px;margin-bottom:16px">📋</div>
+                        <h3 style="font-size:18px;font-weight:600;margin-bottom:8px">No requests yet</h3>
+                        <p style="color:#6B7280;margin-bottom:20px">You haven't raised any vacancy requests yet.</p>
+                        <a href="raise-vacancy.html" class="btn btn-primary">📝 Raise First Request</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = data.map(r => `
+                <div class="card" style="margin-bottom:16px">
+                    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+                        <div>
+                            <h3 style="font-size:18px;font-weight:700;margin-bottom:4px">${r.title}</h3>
+                            <p style="color:#6B7280;font-size:14px">${r.department_name} • ${r.location_name || 'No location'}</p>
+                        </div>
+                        ${statusBadge(r.status)}
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+                        <div style="background:#F9FAFB;padding:12px;border-radius:8px">
+                            <p style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:4px">VACANCIES</p>
+                            <p style="font-weight:600">${r.vacancies}</p>
+                        </div>
+                        <div style="background:#F9FAFB;padding:12px;border-radius:8px">
+                            <p style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:4px">EXPERIENCE</p>
+                            <p style="font-weight:600">${r.experience}</p>
+                        </div>
+                        <div style="background:#F9FAFB;padding:12px;border-radius:8px">
+                            <p style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:4px">SUBMITTED</p>
+                            <p style="font-weight:600">${new Date(r.created_at).toLocaleDateString('en-IN')}</p>
+                        </div>
+                    </div>
+
+                    ${r.skill_names.length > 0 ? `
+                        <div style="margin-bottom:12px">
+                            <p style="font-size:12px;color:#9CA3AF;font-weight:600;margin-bottom:6px">SKILLS</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:6px">
+                                ${r.skill_names.map(s => `<span style="background:#EEF2FF;color:#4F46E5;padding:3px 10px;border-radius:20px;font-size:12px">${s}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div style="background:#F9FAFB;padding:12px;border-radius:8px;margin-bottom:12px">
+                        <p style="font-size:12px;color:#9CA3AF;font-weight:600;margin-bottom:4px">REASON</p>
+                        <p style="font-size:14px;color:#374151">${r.description}</p>
+                    </div>
+
+                    ${r.status === 'REJECTED' && r.rejection_reason ? `
+                        <div style="background:#FEE2E2;padding:12px;border-radius:8px;border:1px solid #FCA5A5">
+                            <p style="font-size:12px;color:#991B1B;font-weight:600;margin-bottom:4px">❌ REJECTION REASON</p>
+                            <p style="font-size:14px;color:#991B1B">${r.rejection_reason}</p>
+                        </div>
+                    ` : ''}
+
+                    ${r.status === 'ACCEPTED' ? `
+                        <div style="background:#D1FAE5;padding:12px;border-radius:8px;border:1px solid #6EE7B7">
+                            <p style="font-size:13px;color:#065F46">✅ Your request was accepted and a job opening has been posted!</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+
+        } catch (e) {
+            document.getElementById('requests-container').innerHTML = '<div class="loading">Failed to load requests</div>';
+        }
+    }
+
+    loadRequests();
+</script>
+</body>
+</html>

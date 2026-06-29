@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Master Tables</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>⚡ Synergycom</h1>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="employee-list.html"><span class="icon">👥</span> Employees</a>
+            <a href="add-employee.html"><span class="icon">➕</span> Add Employee</a>
+            <a href="masters.html" class="active"><span class="icon">📋</span> Master Tables</a>
+            <a href="admin-change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">A</div>
+                <div class="user-info">
+                    <p id="user-name">Admin</p>
+                    <span id="user-role">Administrator</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <p class="page-title">Master Tables</p>
+
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error" id="error-alert"></div>
+
+        <div class="tabs" style="max-width:400px">
+            <button class="tab active" onclick="switchTab('departments')">🏢 Departments</button>
+            <button class="tab" onclick="switchTab('skills')">🛠️ Skills</button>
+            <button class="tab" onclick="switchTab('locations')">📍 Locations</button>
+        </div>
+
+        <!-- Departments -->
+        <div id="tab-departments">
+            <div class="card">
+                <p class="card-title">Add Department</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Department Name *</label>
+                        <input type="text" id="dept-name" placeholder="Engineering" />
+                    </div>
+                    <div class="form-group">
+                        <label>Code *</label>
+                        <input type="text" id="dept-code" placeholder="ENG" />
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label>Description</label>
+                        <input type="text" id="dept-desc" placeholder="Optional description" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="createDept()">➕ Add Department</button>
+            </div>
+            <div class="card">
+                <p class="card-title">All Departments</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Name</th><th>Code</th><th>Description</th><th>Status</th></tr></thead>
+                        <tbody id="dept-tbody"><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div id="tab-skills" style="display:none">
+            <div class="card">
+                <p class="card-title">Add Skill</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Skill Name *</label>
+                        <input type="text" id="skill-name" placeholder="Python" />
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="skill-desc" placeholder="Optional description" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="createSkill()">➕ Add Skill</button>
+            </div>
+            <div class="card">
+                <p class="card-title">All Skills</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Name</th><th>Description</th><th>Status</th></tr></thead>
+                        <tbody id="skill-tbody"><tr><td colspan="3" class="loading">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Locations -->
+        <div id="tab-locations" style="display:none">
+            <div class="card">
+                <p class="card-title">Add Location</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Location Name *</label>
+                        <input type="text" id="loc-name" placeholder="Hyderabad Office" />
+                    </div>
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" id="loc-city" placeholder="Hyderabad" />
+                    </div>
+                    <div class="form-group">
+                        <label>State *</label>
+                        <input type="text" id="loc-state" placeholder="Telangana" />
+                    </div>
+                    <div class="form-group">
+                        <label>Country</label>
+                        <input type="text" id="loc-country" value="India" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="createLocation()">➕ Add Location</button>
+            </div>
+            <div class="card">
+                <p class="card-title">All Locations</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Name</th><th>City</th><th>State</th><th>Country</th><th>Status</th></tr></thead>
+                        <tbody id="loc-tbody"><tr><td colspan="5" class="loading">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role = localStorage.getItem('role_code');
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'ADMIN' && role !== 'HR') window.location.href = 'employee-dashboard.html';
+
+    const name = localStorage.getItem('employee_name') || 'Admin';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-role').textContent = localStorage.getItem('role_name') || 'Admin';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() {
+        return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('success-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('error-alert').classList.remove('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg; el.classList.add('show');
+        document.getElementById('success-alert').classList.remove('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    function switchTab(tab) {
+        ['departments', 'skills', 'locations'].forEach(t => {
+            document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
+        });
+        document.querySelectorAll('.tab').forEach((btn, i) => {
+            btn.classList.toggle('active', ['departments','skills','locations'][i] === tab);
+        });
+    }
+
+    async function loadDepts() {
+        const res = await fetch(`${API}/masters/departments/`, { headers: authHeaders() });
+        const data = await res.json();
+        const tbody = document.getElementById('dept-tbody');
+        if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="loading">No departments yet</td></tr>'; return; }
+        tbody.innerHTML = data.map(d => `
+            <tr>
+                <td><strong>${d.name}</strong></td>
+                <td>${d.code}</td>
+                <td>${d.description || '-'}</td>
+                <td><span class="badge ${d.is_active ? 'badge-success' : 'badge-danger'}">${d.is_active ? 'Active' : 'Inactive'}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    async function createDept() {
+        const name = document.getElementById('dept-name').value.trim();
+        const code = document.getElementById('dept-code').value.trim();
+        const desc = document.getElementById('dept-desc').value.trim();
+        if (!name || !code) { showError('Name and Code are required'); return; }
+        const res = await fetch(`${API}/masters/departments/`, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ name, code, description: desc, is_active: true })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showSuccess('Department added!');
+            document.getElementById('dept-name').value = '';
+            document.getElementById('dept-code').value = '';
+            document.getElementById('dept-desc').value = '';
+            loadDepts();
+        } else {
+            showError(Object.values(data).flat().join(', ') || 'Failed');
+        }
+    }
+
+    async function loadSkills() {
+        const res = await fetch(`${API}/masters/skills/`, { headers: authHeaders() });
+        const data = await res.json();
+        const tbody = document.getElementById('skill-tbody');
+        if (!data.length) { tbody.innerHTML = '<tr><td colspan="3" class="loading">No skills yet</td></tr>'; return; }
+        tbody.innerHTML = data.map(s => `
+            <tr>
+                <td><strong>${s.name}</strong></td>
+                <td>${s.description || '-'}</td>
+                <td><span class="badge ${s.is_active ? 'badge-success' : 'badge-danger'}">${s.is_active ? 'Active' : 'Inactive'}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    async function createSkill() {
+        const name = document.getElementById('skill-name').value.trim();
+        const desc = document.getElementById('skill-desc').value.trim();
+        if (!name) { showError('Skill name is required'); return; }
+        const res = await fetch(`${API}/masters/skills/`, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ name, description: desc, is_active: true })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showSuccess('Skill added!');
+            document.getElementById('skill-name').value = '';
+            document.getElementById('skill-desc').value = '';
+            loadSkills();
+        } else {
+            showError(Object.values(data).flat().join(', ') || 'Failed');
+        }
+    }
+
+    async function loadLocations() {
+        const res = await fetch(`${API}/masters/locations/`, { headers: authHeaders() });
+        const data = await res.json();
+        const tbody = document.getElementById('loc-tbody');
+        if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="loading">No locations yet</td></tr>'; return; }
+        tbody.innerHTML = data.map(l => `
+            <tr>
+                <td><strong>${l.name}</strong></td>
+                <td>${l.city}</td>
+                <td>${l.state}</td>
+                <td>${l.country}</td>
+                <td><span class="badge ${l.is_active ? 'badge-success' : 'badge-danger'}">${l.is_active ? 'Active' : 'Inactive'}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    async function createLocation() {
+        const name = document.getElementById('loc-name').value.trim();
+        const city = document.getElementById('loc-city').value.trim();
+        const state = document.getElementById('loc-state').value.trim();
+        const country = document.getElementById('loc-country').value.trim() || 'India';
+        if (!name || !city || !state) { showError('Name, City and State are required'); return; }
+        const res = await fetch(`${API}/masters/locations/`, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ name, city, state, country, is_active: true })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showSuccess('Location added!');
+            document.getElementById('loc-name').value = '';
+            document.getElementById('loc-city').value = '';
+            document.getElementById('loc-state').value = '';
+            loadLocations();
+        } else {
+            showError(Object.values(data).flat().join(', ') || 'Failed');
+        }
+    }
+
+    loadDepts();
+    loadSkills();
+    loadLocations();
+</script>
+</body>
+</html>

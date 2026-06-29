@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy — Screening Results</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .job-select-card {
+            background: white; border-radius: 14px; padding: 20px 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 22px;
+            border: 1px solid #E5E7EB;
+        }
+        .stats-strip {
+            display: flex; gap: 14px; margin-bottom: 22px; flex-wrap: wrap;
+        }
+        .stat-pill {
+            background: white; border: 1px solid #E5E7EB; border-radius: 10px;
+            padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+            flex: 1; min-width: 140px;
+        }
+        .stat-pill .ico { font-size: 22px; }
+        .stat-pill .val { font-size: 22px; font-weight: 800; line-height: 1; }
+        .stat-pill .lbl { font-size: 11px; color: #6B7280; font-weight: 600; text-transform: uppercase; }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+        }
+        .candidate-card {
+            background: white; border: 1px solid #E5E7EB; border-radius: 14px;
+            overflow: hidden; transition: box-shadow .2s;
+        }
+        .candidate-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+
+        .card-top {
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid #F3F4F6;
+        }
+        .card-rank {
+            font-size: 11px; font-weight: 700; color: #9CA3AF;
+            text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px;
+        }
+        .card-name { font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 4px; }
+        .card-pii { display: flex; flex-direction: column; gap: 3px; }
+        .pii-row {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #6B7280;
+        }
+        .pii-row .icon { font-size: 13px; }
+
+        .score-section {
+            padding: 14px 20px;
+            border-bottom: 1px solid #F3F4F6;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .score-circle {
+            width: 54px; height: 54px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; flex-shrink: 0;
+        }
+        .score-circle .num { font-size: 17px; font-weight: 900; line-height: 1; }
+        .score-circle .pct { font-size: 10px; font-weight: 600; opacity: .7; }
+        .score-bar-wrap { flex: 1; }
+        .score-bar-label {
+            display: flex; justify-content: space-between;
+            font-size: 11px; color: #9CA3AF; margin-bottom: 5px;
+        }
+        .score-bar-bg {
+            background: #F3F4F6; border-radius: 20px; height: 7px; overflow: hidden;
+        }
+        .score-bar-fill { height: 100%; border-radius: 20px; transition: width .6s; }
+        .score-reason {
+            font-size: 11px; color: #6B7280; margin-top: 6px; line-height: 1.5;
+        }
+
+        .card-footer {
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        }
+        .badge-shortlisted {
+            background: #D1FAE5; color: #065F46; padding: 4px 12px;
+            border-radius: 20px; font-size: 11px; font-weight: 700;
+            border: 1px solid #6EE7B7;
+        }
+        .btn-view-resume {
+            background: #4F46E5; color: white; border: none;
+            padding: 7px 16px; border-radius: 8px; font-size: 12px;
+            font-weight: 700; cursor: pointer; transition: opacity .2s;
+            white-space: nowrap;
+        }
+        .btn-view-resume:hover { opacity: .85; }
+        .btn-view-resume:disabled {
+            background: #E5E7EB; color: #9CA3AF; cursor: not-allowed;
+        }
+
+        .sharepoint-tag { font-size: 10px; color: #059669; font-weight: 600; }
+        .disk-tag       { font-size: 10px; color: #4F46E5; font-weight: 600; }
+
+        .empty-card {
+            background: white; border: 1px solid #E5E7EB; border-radius: 14px;
+            padding: 48px; text-align: center; grid-column: 1 / -1;
+        }
+        .empty-icon { font-size: 40px; margin-bottom: 12px; }
+        .empty-text { color: #6B7280; font-size: 14px; }
+
+        .loading-card {
+            background: white; border: 1px solid #E5E7EB; border-radius: 14px;
+            padding: 36px; text-align: center; color: #6B7280; font-size: 13px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.6); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white; border-radius: 14px; width: 90vw; height: 90vh;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        }
+        .modal-header {
+            padding: 14px 20px; border-bottom: 1px solid #E5E7EB;
+            display: flex; justify-content: space-between; align-items: center;
+            background: #F9FAFB;
+        }
+        .modal-header span { font-weight: 700; font-size: 14px; color: #111827; }
+        .modal-close {
+            background: #EF4444; color: white; border: none;
+            border-radius: 6px; padding: 6px 14px; cursor: pointer; font-weight: 700;
+        }
+        .modal-body { flex: 1; overflow: hidden; }
+        .modal-body iframe { width: 100%; height: 100%; border: none; }
+        .modal-loading { padding: 40px; text-align: center; color: #6B7280; font-size: 13px; }
+
+        .alert { padding: 12px 18px; border-radius: 8px; font-size: 13px;
+                 font-weight: 600; margin-bottom: 14px; display: none; }
+        .alert.show { display: block; }
+        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+        .alert-error   { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo"><h1>⚡ Synergycom</h1><p>Admin Panel</p></div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html"><span class="icon">🏠</span> Dashboard</a>
+            <a href="employee-list.html"><span class="icon">👥</span> Employees</a>
+            <a href="add-employee.html"><span class="icon">➕</span> Add Employee</a>
+            <a href="masters.html"><span class="icon">📋</span> Master Tables</a>
+            <a href="vacancy-requests.html"><span class="icon">📝</span> Vacancy Requests</a>
+            <a href="admin-job-openings.html"><span class="icon">📢</span> Job Openings</a>
+            <a href="hr-screening-results.html" class="active"><span class="icon">🔍</span> Screening Results</a>
+            <a href="admin-change-password.html"><span class="icon">🔑</span> Change Password</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="avatar-initials">A</div>
+                <div class="user-info">
+                    <p id="user-name">Admin</p>
+                    <span id="user-role">HR</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <p class="page-title">🔍 Shortlisted Candidates</p>
+
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error"   id="error-alert"></div>
+
+        <!-- Job Selector -->
+        <div class="job-select-card">
+            <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">
+                <div class="form-group" style="flex:1;min-width:200px;margin-bottom:0">
+                    <label>Select Job Opening</label>
+                    <select id="job-select" onchange="loadResults()">
+                        <option value="">— Select a job —</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-strip" id="stats-strip" style="display:none">
+            <div class="stat-pill">
+                <div class="ico">✅</div>
+                <div>
+                    <div class="val" id="stat-shortlisted" style="color:#059669">—</div>
+                    <div class="lbl">Shortlisted</div>
+                </div>
+            </div>
+            <div class="stat-pill">
+                <div class="ico">📊</div>
+                <div>
+                    <div class="val" id="stat-avg-score" style="color:#4F46E5">—</div>
+                    <div class="lbl">Avg Score</div>
+                </div>
+            </div>
+            <div class="stat-pill">
+                <div class="ico">☁️</div>
+                <div>
+                    <div class="val" id="stat-sharepoint" style="color:#0EA5E9">—</div>
+                    <div class="lbl">On SharePoint</div>
+                </div>
+            </div>
+            <div class="stat-pill">
+                <div class="ico">🏆</div>
+                <div>
+                    <div class="val" id="stat-top-score" style="color:#F59E0B">—</div>
+                    <div class="lbl">Top Score</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards Grid -->
+        <div id="results-container">
+            <div class="empty-card">
+                <div class="empty-icon">🔍</div>
+                <div class="empty-text">Select a job opening above to view shortlisted candidates</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Resume Preview Modal -->
+<div class="modal-overlay" id="preview-modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span id="modal-title">Resume Preview</span>
+            <button class="modal-close" onclick="closePreview()">✕ Close</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="modal-loading">Loading resume…</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API   = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('access_token');
+    const role  = localStorage.getItem('role_code');
+    if (!token) window.location.href = 'index.html';
+    if (role !== 'ADMIN' && role !== 'HR') window.location.href = 'employee-dashboard.html';
+
+    const name = localStorage.getItem('employee_name') || 'Admin';
+    document.getElementById('user-name').textContent       = name;
+    document.getElementById('user-role').textContent       = localStorage.getItem('role_name') || 'HR';
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+
+    function authHeaders() { return { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` }; }
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('success-alert');
+        el.textContent = msg; el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    function showError(msg) {
+        const el = document.getElementById('error-alert');
+        el.textContent = msg; el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    function scoreColor(s) {
+        if (s >= 80) return '#059669';
+        if (s >= 60) return '#F59E0B';
+        if (s >= 40) return '#F97316';
+        return '#EF4444';
+    }
+    function scoreBg(s) {
+        if (s >= 80) return '#D1FAE5';
+        if (s >= 60) return '#FEF3C7';
+        if (s >= 40) return '#FFEDD5';
+        return '#FEE2E2';
+    }
+    function rankLabel(i) {
+        return i === 0 ? '🥇 #1 Top Match'
+             : i === 1 ? '🥈 #2 Match'
+             : i === 2 ? '🥉 #3 Match'
+             : `#${i + 1} Match`;
+    }
+
+    /* ── Safe string for onclick attr ── */
+    function esc(str) {
+        return (str || '')
+            .replace(/\r?\n/g, ' ')   // remove newlines — breaks onclick strings
+            .replace(/\s+/g, ' ')      // collapse multiple spaces
+            .trim()
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'");
+    }
+
+    let allResults = [];
+
+    function renderCards(results) {
+        const container = document.getElementById('results-container');
+
+        if (!results.length) {
+            container.innerHTML = `
+                <div class="empty-card">
+                    <div class="empty-icon">📭</div>
+                    <div class="empty-text">No shortlisted candidates for this job yet.<br>
+                        Run AI Screening to auto-shortlist top candidates.</div>
+                </div>`;
+            return;
+        }
+
+        const avg  = Math.round(results.reduce((s, r) => s + r.match_score, 0) / results.length);
+        const top  = Math.max(...results.map(r => r.match_score));
+        const onSP = results.filter(r => r.sharepoint_filename).length;
+
+        document.getElementById('stat-shortlisted').textContent = results.length;
+        document.getElementById('stat-avg-score').textContent   = avg + '%';
+        document.getElementById('stat-sharepoint').textContent  = onSP;
+        document.getElementById('stat-top-score').textContent   = top + '%';
+        document.getElementById('stats-strip').style.display    = 'flex';
+
+        container.innerHTML = `<div class="results-grid">
+            ${results.map((r, i) => {
+                /*
+                 * FIX: Always prefer sharepoint_filename (the real timestamped
+                 * name uploaded to SharePoint) over source_filename.
+                 *
+                 * The backend now always returns sharepoint_filename from the
+                 * Candidate record in ScreeningResultsView, so this will be
+                 * the correct name that actually exists in SharePoint.
+                 *
+                 * source_filename = "Priya_Sharma.pdf"             ← WRONG for SP
+                 * sharepoint_filename = "Priya_Sharma_20260622.pdf" ← CORRECT for SP
+                 */
+                const previewFile  = r.sharepoint_filename || r.source_filename || '';
+                const onSharePoint = !!r.sharepoint_filename && r.is_posted_to_sharepoint;
+                // FIX: clean newlines from candidate_name — "Arjun Mehta\nSenior" breaks onclick
+                const cleanName = (r.candidate_name || '—').replace(/\r?\n/g, ' ').replace(/\s+/g, ' ').trim();
+
+                return `
+                <div class="candidate-card">
+                    <div class="card-top">
+                        <div class="card-rank">${rankLabel(i)}</div>
+                        <div class="card-name">${cleanName}</div>
+                        <div class="card-pii">
+                            ${r.candidate_email ? `
+                            <div class="pii-row">
+                                <span class="icon">📧</span>
+                                <a href="mailto:${r.candidate_email}"
+                                   style="color:#4F46E5;text-decoration:none;font-size:12px">
+                                   ${r.candidate_email}
+                                </a>
+                            </div>` : ''}
+                            ${r.candidate_phone ? `
+                            <div class="pii-row">
+                                <span class="icon">📞</span>
+                                <span>${r.candidate_phone}</span>
+                            </div>` : ''}
+                            ${!r.candidate_email && !r.candidate_phone ? `
+                            <div class="pii-row" style="color:#D1D5DB;font-size:11px">
+                                No contact info extracted
+                            </div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="score-section">
+                        <div class="score-circle"
+                             style="background:${scoreBg(r.match_score)};color:${scoreColor(r.match_score)}">
+                            <div class="num">${r.match_score}</div>
+                            <div class="pct">%</div>
+                        </div>
+                        <div class="score-bar-wrap">
+                            <div class="score-bar-label">
+                                <span>Match Score</span>
+                                <span style="color:${scoreColor(r.match_score)};font-weight:700">
+                                    ${r.match_score >= 80 ? 'Excellent' : r.match_score >= 60 ? 'Good' : 'Average'}
+                                </span>
+                            </div>
+                            <div class="score-bar-bg">
+                                <div class="score-bar-fill"
+                                     style="width:${r.match_score}%;background:${scoreColor(r.match_score)}">
+                                </div>
+                            </div>
+                            <div class="score-reason">${r.reason || 'No reason provided'}</div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div style="display:flex;flex-direction:column;gap:4px">
+                            <span class="badge-shortlisted">✅ Auto-Shortlisted</span>
+                            ${onSharePoint
+                                ? '<span class="sharepoint-tag">☁️ On SharePoint</span>'
+                                : '<span class="disk-tag">💾 Served from disk</span>'}
+                        </div>
+                        ${previewFile
+                            ? `<button class="btn-view-resume"
+                                       onclick="previewResume('${esc(previewFile)}','${esc(cleanName)}')" >
+                                   👁️ View Resume
+                               </button>`
+                            : `<button class="btn-view-resume" disabled>Resume Unavailable</button>`
+                        }
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>`;
+    }
+
+    async function loadJobs() {
+        try {
+            const res  = await fetch(`${API}/recruitment/results/`, { headers: authHeaders() });
+            const jobs = await res.json();
+            const sel  = document.getElementById('job-select');
+            (Array.isArray(jobs) ? jobs : []).forEach(j => {
+                const opt = document.createElement('option');
+                opt.value = j.id;
+                opt.textContent = `${j.title} — ${j.department} (${j.result_count} screened)`;
+                sel.appendChild(opt);
+            });
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadResults() {
+        const jobId = document.getElementById('job-select').value;
+        if (!jobId) return;
+
+        document.getElementById('stats-strip').style.display = 'none';
+        document.getElementById('results-container').innerHTML =
+            '<div class="loading-card">⏳ Loading shortlisted candidates…</div>';
+
+        try {
+            // ── Use screening results endpoint directly ────────────────────────
+            // It already has: name, email, score, reason, source_filename,
+            // sharepoint_filename (enriched by backend from Candidate table),
+            // and is_shortlisted flag (set correctly by ScreeningResultsView).
+            const res  = await fetch(`${API}/recruitment/results/${jobId}/`, { headers: authHeaders() });
+            const data = await res.json();
+            const all  = Array.isArray(data) ? data : (data.results || []);
+
+            // Filter to shortlisted only and sort by score descending
+            allResults = all
+                .filter(r => r.is_shortlisted)
+                .sort((a, b) => b.match_score - a.match_score);
+
+            renderCards(allResults);
+        } catch(e) {
+            console.error('[loadResults] Error:', e);
+            document.getElementById('results-container').innerHTML =
+                '<div class="loading-card" style="color:#EF4444">❌ Failed to load. Is the server running?</div>';
+        }
+    }
+
+    /* ── Resume Preview ── */
+    async function previewResume(filename, candidateName) {
+        /*
+         * FIX: filename here is now always sharepoint_filename
+         * (the real timestamped name uploaded to SP).
+         * The backend ResumePreviewView will:
+         *   1. Try disk first (works before shortlisting)
+         *   2. Call SharePoint with the CORRECT filename (works after shortlisting)
+         */
+        if (!filename) { showError('No resume file linked to this candidate.'); return; }
+
+        document.getElementById('modal-title').textContent = `Resume — ${candidateName.replace(/\r?\n/g,' ').trim()}`;
+        document.getElementById('modal-body').innerHTML    =
+            '<div class="modal-loading">⏳ Loading resume…</div>';
+        document.getElementById('preview-modal').classList.add('open');
+
+        try {
+            const url = `${API}/recruitment/resume-preview/?filename=${encodeURIComponent(filename)}`;
+            const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: res.statusText }));
+                document.getElementById('modal-body').innerHTML =
+                    `<div class="modal-loading" style="color:#EF4444">
+                        ❌ Could not load resume: ${err.error || res.statusText}<br>
+                        <small style="color:#9CA3AF">File: ${filename}</small>
+                     </div>`;
+                return;
+            }
+
+            const blob    = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const ext     = filename.split('.').pop().toLowerCase();
+
+            if (ext === 'pdf') {
+                document.getElementById('modal-body').innerHTML =
+                    `<iframe src="${blobUrl}" title="Resume Preview"></iframe>`;
+            } else {
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="modal-loading">
+                        <p>📄 DOCX files cannot be previewed in browser.</p>
+                        <a href="${blobUrl}" download="${filename}"
+                           style="background:#4F46E5;color:white;padding:10px 20px;
+                                  border-radius:8px;text-decoration:none;font-weight:700">
+                            ⬇️ Download ${filename}
+                        </a>
+                    </div>`;
+            }
+        } catch(e) {
+            document.getElementById('modal-body').innerHTML =
+                `<div class="modal-loading" style="color:#EF4444">❌ Error: ${e.message}</div>`;
+        }
+    }
+
+    function closePreview() {
+        document.getElementById('preview-modal').classList.remove('open');
+        document.getElementById('modal-body').innerHTML = '';
+    }
+    document.getElementById('preview-modal').addEventListener('click', function(e) {
+        if (e.target === this) closePreview();
+    });
+
+    loadJobs();
+</script>
+</body>
+</html>
